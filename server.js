@@ -244,9 +244,25 @@ passport.deserializeUser(function(아이디, done){
 // Search 요청이 왔을 때 
 app.get('/search', function(요청, 응답) { 
     //console.log(요청.query);
-    //응답.render('write.ejs');   // 응답값을 브라우져로 던지지 않음!
-    collectionPost.find({제목 :요청.query.value}).toArray(function(에러, 결과){
-        //console.log(결과);
+ 
+    var 검색조건 = [
+        { 
+            $search: {
+                index: 'titleSearch',
+                text:{
+                    query : 요청.query.value,
+                    path : "제목"
+                }
+            }
+        },
+        {$sort : {_id : 1} },                                           // 소팅 기능
+        {$limit : 10},                                                  // 데이터수 제한
+        {$project : {제목 : 1, score : {$meta : 'searchScore'}, },},    //특정 조건에 맞게 찾아오기(제목 표시하고, 검색점수를 표시한다. )
+    ];
+    // 정규식 : 비슷한거 찾을 때 => /찾을내용/
+    // 빨리 찾고 싶으면 인덱스를 DB에 추가하고 아래와 같은 방식으로 명령을 주면 빨리 찾는다. 
+    collectionPost.aggregate(검색조건).toArray(function(에러, 결과){
+        console.log(결과);
         응답.render('search.ejs', {posts : 결과});
     });
 });
