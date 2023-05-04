@@ -13,7 +13,13 @@
   <body>
 
     <%- include('nav.html')%>
-
+    <% 
+      if (typeof register !== "undefined") {%>
+        <h1 class="text-center ml-2 my-3"> 사용자 : <%= register %>  </h1>
+    <% } %>
+    
+      
+    
 
       <h1 class="text-center ml-2 my-3"> 서버에서 가져온 할일 리스트  </h1>
 
@@ -23,6 +29,7 @@
       </div>
 
       <script>
+        // 검색데이터를 Get 요청으로 요청하는 방법 
         $('#search').click(function(e) {
           var 입력한값 =  $('#search-input').val();
           //alert('서치버튼 눌려져떠여' + 입력한값);
@@ -38,8 +45,10 @@
             <P>글번호 : <%= posts[i]._id %> </P>
             <h4>할일 제목 : <%= posts[i].제목 %> </h4>
             <P>할일 마감 날짜 : <%= posts[i].날짜 %> </P>
+            <P>작성자 : <%= posts[i].작성자 %> </P>
             <button class="btn btn-info put" data-id="<%= posts[i]._id %>">수정</button>
             <button class="btn btn-danger delete" data-id="<%= posts[i]._id %>">삭제</button>
+            <button class="btn btn-danger chat" data-id="<%= posts[i]._id %>" data-id-user="<%= posts[i].작성자 %>">채팅하기</button>
           </a>
           <% } %>
         </div>
@@ -63,6 +72,7 @@
             window.location.replace('/search?value=' + 입력한값);
           });
 
+
           $('.delete').click(function(e){
             var 글번호 = e.target.dataset.id; 
             var 지금누른거 = $(this);
@@ -81,22 +91,47 @@
 
           });
 
-          // $('.put').click(function(e){
-          //   var 글번호 = e.target.dataset.id; 
-          //   var 지금누른거 = $(this);
+          $('.put').click(function(e){
+            var 임시글번호 = e.target.dataset.id; 
+            //var 방금누른거 = $(this);
+            
+            ////console.log("글번호 : ", e.target.dataset.id);
+            //alert(e.target.dataset.id);
 
-          //   $.ajax({
-          //     method : 'GET',
-          //     url : '/edit/'+ 글번호,
-          //     data : {_id : 글번호 },
-          //   }).done(function(결과){
-          //     // 페이지를 강제로 새로고침해주세요 
-          //     alert('수정 페이지를 잘띄웠다고 서버에서 응답이 왔어요');
-          //     //지금누른거.parent('a').fadeOut();
-          //   }).fail(function(xhr, textStatus, errorThrown){
-          //     console.log(xhr, textStatus, errorThrown);
-          //   });
-          // });
+            $.ajax({
+              method : 'PUT',
+              url : '/edit',
+              data : {_id : 임시글번호 },
+            }).done(function(결과){
+              // 페이지를 강제로 새로고침해주세요 
+              //alert('수정 페이지를 잘띄웠다고 서버에서 응답이 왔어요');
+              //방금누른거.parent('a').fadeOut();
+            }).fail(function(xhr, textStatus, errorThrown){
+              console.log(xhr, textStatus, errorThrown);
+            });
+          });
+
+
+          $('.chat').click(function(e){
+            var 임시글번호 = e.target.dataset.id; 
+            var 임시작성자 = e.target.dataset.idUser;
+            //var 방금누른거 = $(this);
+            
+            //console.log(임시글번호, 임시작성자);
+            //alert(임시작성자);
+
+            $.ajax({
+              method : 'POST',
+              url : '/chat',
+              data : {_id : 임시글번호, user : 임시작성자 },
+            }).done(function(결과){
+              // 페이지를 강제로 새로고침해주세요 
+              //alert('수정 페이지를 잘띄웠다고 서버에서 응답이 왔어요');
+              //방금누른거.parent('a').fadeOut();
+            }).fail(function(xhr, textStatus, errorThrown){
+              console.log(xhr, textStatus, errorThrown);
+            });
+          });
         </script>
 
 
