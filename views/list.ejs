@@ -30,6 +30,8 @@
         <button class="input-group-append btn btn-danger" id="search">검색</button>
       </div>
 
+      <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+
       <script>
         // 검색데이터를 Get 요청으로 요청하는 방법 
         $('#search').click(function(e) {
@@ -42,15 +44,15 @@
       <div class="container">
         <!-- aria-current="true" -->
         <div class="list-group">
-          <% for (let i = 0 ; i < posts.length ; i++) { %>
+          <% for (let i = 0 ; i < people.length ; i++) { %>
           <a href="#" class="list-group-item list-group-item-action">
-            <P>글번호 : <%= posts[i]._id %> </P>
-            <h4>할일 제목 : <%= posts[i].제목 %> </h4>
-            <P>할일 마감 날짜 : <%= posts[i].날짜 %> </P>
-            <P>작성자 : <%= posts[i].작성자 %> </P>
-            <button class="btn btn-info put" data-id="<%= posts[i]._id %>">수정</button>
-            <button class="btn btn-danger delete" data-id="<%= posts[i]._id %>">삭제</button>
-            <button class="btn btn-danger chat" data-id="<%= posts[i]._id %>" data-id-user="<%= posts[i].작성자 %>">채팅하기</button>
+            <P>글번호 : <%= people[i]._id %> </P>
+            <h4>이름 : <%= people[i].name %> </h4>
+            <P>기관 : <%= people[i].institution %> </P>
+            <P>평가 횟수 : <%= people[i].counter %> </P>
+            <button class="btn btn-info put" data-id="<%= people[i]._id %>">평가하기</button>
+            <button class="btn btn-danger delete" data-id="<%= people[i]._id %>">삭제</button>
+            <!-- <button class="btn btn-danger chat" data-id="<%= people[i]._id %>" data-id-user="<%= people[i].작성자 %>">채팅하기</button> -->
           </a>
           <% } %>
         </div>
@@ -97,12 +99,12 @@
             var 임시글번호 = e.target.dataset.id; 
             //var 방금누른거 = $(this);
             
-            ////console.log("글번호 : ", e.target.dataset.id);
+            //console.log("글번호 : ", e.target.dataset.id);
             //alert(e.target.dataset.id);
 
             $.ajax({
               method : 'PUT',
-              url : '/edit',
+              url : '/edit/' + 임시글번호,
               data : {_id : 임시글번호 },
             }).done(function(결과){
               // 페이지를 강제로 새로고침해주세요 

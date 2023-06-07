@@ -12,19 +12,30 @@
 
   <!-- (여긴 다른 페이지에 있던 <nav></nav> 태그 전부) -->
 
-  <h4 class="container mt-4"><strong>글 수정 페이지</strong></h4>
+  <h4 class="container mt-4"><strong>시무 훈련 평가</strong></h4>
 
   <div class="container mt-3">
-    <form action="/modify" method="POST">
+    <form action="/edit?_method=PUT" method="POST">
+      <!-- 평가대상자에 대한 기본 정보(바뀌지 않는 부분) -->
+
+
       <input type="text" style="display: none;" name="id" value="<%= data._id %>">
+      <input type="text" style="display: none;" name="counter" value="<%= data.counter %>">
       <div class="form-group">
-        <label>오늘의 할일</label>
-        <input type="text" class="form-control" name="title" value="<%= data.제목 %>">
+        <label>평가 대상자</label>
+        <input type="text" class="form-control" name="name" value="<%= data.name %>" readonly>
       </div>
       <div class="form-group">
-        <label>날짜</label>
-        <input type="text" class="form-control" name="date" value="<%= data.날짜 %>">
+        <label>기관</label>
+        <input type="text" class="form-control" name="institution" value="<%= data.institution %>" readonly>
       </div>
+      <div class="form-group">
+        <label>나이</label>
+        <input type="text" class="form-control" name="age" value="<%= data.age %>" readonly>
+      </div>    
+
+      <!-- 평가대상자에 대한 평가 폼 -->
+
       <button type="submit" class="btn btn-outline-primary">수정하기</button>
     </form>
   </div>
