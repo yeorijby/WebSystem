@@ -20,7 +20,7 @@ app.use(methodOverride('_method'));
 
 // 환경변수를 사용하기 위해서 
 require('dotenv').config();
-
+ 
 
 
 // 몽고DB 접속 URI
@@ -52,16 +52,28 @@ let collectionChatroom;
 //   });
 // })
 
+let db_Evaluate;
+let Eval_Collect_People;
+let Eval_Collect_Counter;
 // // env 파일 적용하는 몽고DB 접속 구문
 MongoClient.connect(process.env.DB_URL, function(err, client){
-    if (err) return console.log(err)
+    if (err) 
+        return console.log(err)
     
-    db = client.db('todoapp');
+    // db = client.db('todoapp');
     
-    collectionPost = db.collection('post');
-    collectionCounter = db.collection('counter');
-    collectionLogin = db.collection('login');
-    collectionChatroom = db.collection('chatroom');
+    // collectionPost = db.collection('post');
+    // collectionCounter = db.collection('counter');
+    // collectionLogin = db.collection('login');
+    // collectionChatroom = db.collection('chatroom');
+
+    
+
+    db_Evaluate = client.db('evaluate');
+    
+    Eval_Collect_People = db_Evaluate.collection('people');
+    Eval_Collect_Counter = db_Evaluate.collection('counter');
+
     
     app.listen(process.env.PORT, function() {
       console.log('listening on' + process.env.PORT);
@@ -79,27 +91,49 @@ app.get('/write', function(요청, 응답) {
 });
 
 app.get('/list', function(요청, 응답) { 
-    collectionPost.find().toArray(function(에러, 결과){
-        //console.log(결과);
-        응답.render('list.ejs', {posts : 결과});
+    Eval_Collect_People.find().toArray(function(에러, 결과){
+        console.log(결과);
+        응답.render('list.ejs', {people : 결과});
     });
 });
 
-app.get('/edit', function(요청, 응답) { 
-    응답.render('edit.ejs', {posts : 결과});
-});
 
-
-app.get('/detail/:id', function(요청, 응답) { 
-
-    var id = parseInt(요청.params.id);
-    collectionPost.findOne({_id : id}, function(에러, 결과){
-        if (에러) 
-            return 응답.status(400).send({message : '실패했습니다.'});       // 2XX : 요청 성공, 4XX : 잘못된 요청으로 실패, 5XX : 서버의 문제  
-        
-        응답.render('detail.ejs', {data : 결과});
+// Search 요청이 왔을 때 
+app.get('/search', function(요청, 응답) { 
+    //console.log(요청.query);
+ 
+    var 검색조건 = [
+        { 
+            $search: {
+                index: 'titleName',
+                text:{
+                    query : 요청.query.value,
+                    path : "name"
+                }
+            }
+        },
+        {$sort : {_id : 1} },                                           // 소팅 기능(id 순으로)
+        {$limit : 10},                                                  // 데이터수 제한
+        {$project : { _id : 1, name : 1, score : {$meta : 'searchScore'}, },},    // 특정 조건에 맞게 찾아오기(제목 표시하고, 검색점수를 표시한다. )
+    ];
+    // 정규식 : 비슷한거 찾을 때 => /찾을내용/
+    // 빨리 찾고 싶으면 인덱스를 DB에 추가하고 아래와 같은 방식으로 명령을 주면 빨리 찾는다. 
+    // find가 아닌 aggregate사용한다(검색조건에 배열로 검색이 가능하다.)
+    Eval_Collect_People.aggregate(검색조건).toArray(function(에러, 결과){
+        console.log(결과);
+        응답.render('search.ejs', {posts : 결과});
     });
 });
+
+
+
+
+
+
+
+
+
+
 
 // 세션 방식의 로그인 기능
 // 로그인 기능을 사용하기 위해서 3개의 라이브러리를 설치한다.
@@ -179,80 +213,147 @@ passport.deserializeUser(function(아이디, done){
 
 
 
-// Search 요청이 왔을 때 
-app.get('/search', function(요청, 응답) { 
-    //console.log(요청.query);
- 
-    var 검색조건 = [
-        { 
-            $search: {
-                index: 'titleSearch',
-                text:{
-                    query : 요청.query.value,
-                    path : "제목"
-                }
-            }
-        },
-        {$sort : {_id : 1} },                                           // 소팅 기능(id 순으로)
-        {$limit : 10},                                                  // 데이터수 제한
-        {$project : { _id : 1, 제목 : 1, score : {$meta : 'searchScore'}, },},    // 특정 조건에 맞게 찾아오기(제목 표시하고, 검색점수를 표시한다. )
-    ];
-    // 정규식 : 비슷한거 찾을 때 => /찾을내용/
-    // 빨리 찾고 싶으면 인덱스를 DB에 추가하고 아래와 같은 방식으로 명령을 주면 빨리 찾는다. 
-    // find가 아닌 aggregate사용한다(검색조건에 배열로 검색이 가능하다.)
-    collectionPost.aggregate(검색조건).toArray(function(에러, 결과){
-        console.log(결과);
-        응답.render('search.ejs', {posts : 결과});
-    });
-});
 
 
-let 총게시물갯수;
-app.post('/add', function(요청, 응답){
-  console.log(요청.body);
-//  응답.send('전송완료');      // => 맨 밑에서 함!
-  응답.redirect('/list'); 
 
 
-  var item = { name : '게시물갯수' };
-  collectionCounter.findOne(item, function(에러, 결과){
+
+
+
+
+
+
+let totalPeople;
+app.post('/add', function(req, res){
+  //console.log(요청.body);
+//  res.send('전송완료');      // => 맨 밑에서 함!
+    res.redirect('/list'); 
+
+  var item = { name : 'totalPeople' };
+  Eval_Collect_Counter.findOne(item, function(err1, result1) {
     
-    총게시물갯수 = 결과.totalPost;
+    // if (err1) 
+    //     return console.log(err1);
 
-    let title = 요청.body.title;
-    let date = 요청.body.date;
+    console.log(result1);
+
+    totalPeople = result1.totalCount;
+
+    //console.log(req.body);
+    // let title = req.body.title;
+    // let date = req.body.institution;
   
-    let objInsert = {_id : 총게시물갯수 + 1, 제목 : title, 날짜 : date, 작성자_id : 요청.user._id, 작성자 : 요청.user.id, 작성자비번 : 요청.user.pw};
-    //let objUpdate = { 제목 : title, 날짜 : date};
+//    let objInsert = {_id : totalPeople + 1, name : req.body.name, institution : req.body.institution, age : req.body.age, 작성자_id : req.user._id, 작성자 : req.user.id, 작성자비번 : req.user.pw};
+    let objInsert = {_id : totalPeople + 1, name : req.body.name, institution : req.body.institution, age : req.body.age, counter : 0};
+
   
-    collectionPost.insertOne(objInsert, function(에러, 결과){
+    Eval_Collect_People.insertOne(objInsert, function(err2, result2){
         console.log('넘어온 데이터 저장완료 : ', objInsert);
     
-        collectionCounter.updateOne(item, {$inc : {totalPost : 1} }, function(에러, 결과){
-            if (에러)       return console.log(에러);
+        Eval_Collect_Counter.updateOne(item, {$inc : {totalCount : 1} }, function(err3, result3){
+            if (err3)       return console.log(err3);
     
             //console.log("게시물 Counter가 수정되었습니다 => 결과 : ", 결과);
         });
     });        
   });
+  res.redirect('/list'); 
 });
 
 app.delete('/delete', function(요청, 응답) { 
-    console.log(요청.body);
+    //console.log(요청.body);
 
     요청.body._id = parseInt(요청.body._id);
 
-    var 삭제할데이터 = {_id: 요청.body._id, 작성자_id : 요청.user._id};
+    // var 삭제할데이터 = {_id: 요청.body._id, 작성자_id : 요청.user._id};
+    var 삭제할데이터 = {_id: 요청.body._id};
 
-    collectionPost.deleteOne(삭제할데이터, function(에러, 결과){
+    Eval_Collect_People.deleteOne(삭제할데이터, function(err, 결과){
+        if (err)       return console.log('에러 : ', err);
+
         console.log('삭제완료');
 
-        console.log('에러 : ',에러);
+        //console.log('에러 : ',에러);
 
         응답.status(200).send({message : '성공했습니다.'});       // 2XX : 요청 성공, 4XX : 잘못된 요청으로 실패, 5XX : 서버의 문제  
 
     });    
 });
+
+// 목록페이지(List.ejs) 수정버튼이 눌러졌을 때 수정 페이지(해당 글번호의 값을 불러와서 폼)를 띄우는 기능 구현
+app.get('/edit/:id', function(요청, 응답) { 
+    // var id = parseInt(요청.body._id);
+    var id = parseInt(요청.params.id);
+    // console.log('id : ',id);
+
+    Eval_Collect_People.findOne({_id : id}, function(에러, 결과){
+        if (에러) 
+            return 응답.status(400).send({message : '실패했습니다.'});       // 2XX : 요청 성공, 4XX : 잘못된 요청으로 실패, 5XX : 서버의 문제  
+        
+        // console.log('결과1 : ', 결과);
+        if (!결과)
+        {
+            console.log('결과가 없습니다');
+
+            //return 응답.redirect('/list');
+            return 응답.status(400).send({message : '결과가 없습니다.'});
+        }
+
+        console.log('결과2 : ', 결과);
+        //console.log('응답 : ', 응답);
+
+        응답.render('edit.ejs', {data : 결과});
+        //return 응답.status(200).send({message : '성공하였습니다.'});
+    });
+});
+
+
+// 수정 페이지(edit.ejs)에서 수정 버튼이 해당 글번호의 값을 불러와서 데이터를 업데이트 하는 기능 구현 
+app.put('/edit', function(요청, 응답) { 
+    console.log(요청.body);
+
+    var id = parseInt(요청.body.id);
+    var counter = 요청.body.counter;
+    var name = 요청.body.name;
+    var age = 요청.body.age;
+    var institution = 요청.body.institution;
+
+    // <input type="text" style="display: none;" name="id" value="<%= data._id %>">
+    // <input type="text" style="display: none;" name="counter" value="<%= data.counter %>">
+    // <div class="form-group">
+    //   <label>평가 대상자</label>
+    //   <input type="text" class="form-control" name="name" value="<%= data.name %>" readonly>
+    // </div>
+    // <div class="form-group">
+    //   <label>기관</label>
+    //   <input type="text" class="form-control" name="institution" value="<%= data.institution %>" readonly>
+    // </div>
+    // <div class="form-group">
+    //   <label>나이</label>
+    //   <input type="text" class="form-control" name="age" value="<%= data.age %>" readonly>
+    // </div>
+
+    Eval_Collect_People.updateOne({_id : id}, {$set : {제목 : title, 날짜 : date} }, function(에러, 결과){
+        console.log('수정완료');
+        응답.redirect('/list');
+    });
+});
+/*
+
+app.get('/detail/:id', function(요청, 응답) { 
+
+    var id = parseInt(요청.params.id);
+    collectionPost.findOne({_id : id}, function(에러, 결과){
+        if (에러) 
+            return 응답.status(400).send({message : '실패했습니다.'});       // 2XX : 요청 성공, 4XX : 잘못된 요청으로 실패, 5XX : 서버의 문제  
+        
+        응답.render('detail.ejs', {data : 결과});
+    });
+});
+
+
+
+
 
 // 목록페이지(List.ejs) 수정버튼이 눌러졌을 때 수정 페이지(해당 글번호의 값을 불러와서 폼)를 띄우는 기능 구현
 app.put('/edit', function(요청, 응답) { 
@@ -282,7 +383,6 @@ app.put('/edit', function(요청, 응답) {
     });
 });
 
-// 수정 페이지(edit.ejs)에서 수정 버튼이 해당 글번호의 값을 불러와서 폼을 띄우는 기능 구현
 // app.put('modify', function(요청, 응답){
 //     console.log(요청.body);
 
@@ -397,4 +497,4 @@ app.post('/chat', function(요청, 응답){
 app.get('/chat', function(요청, 응답){
     응답.render('chat.ejs');
 });
-
+//*/
