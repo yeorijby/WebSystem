@@ -1,26 +1,29 @@
+// 코드 변경 될때마다 서버를 재시작 하는것이 귀찮을때 (★★★★★설치 필요 : npm install -g nodemon)
 
+// 서버를 쉽게 짤수있게 도와주는 라이브러리 (★★★★★설치 필요 : npm install express)
 const express = require('express');
 const app = express();
 
-// body-parser 사용하기 위해서 
+// body-parser 사용하기 위해서 (★★★★★설치 필요 : npm install body-parser)
 app.use(express.urlencoded({ extended: true }));
 
-// 몽고 DB를 사용하기 위해서 (설치 필요 : npm install mongoose)
+// 몽고 DB를 사용하기 위해서 
+//(★★★★★설치 필요 : npm install mongoose)
+//(★★★★★설치 필요 : npm install mongodb --save)
 const MongoClient = require('mongodb').MongoClient;
 
-// ejs 엔진을 사용하기 위해서 (설치 필요 : npm install ejs)
+// ejs 엔진을 사용하기 위해서 (★★★★★설치 필요 : npm install ejs)
 app.set('view engine', 'ejs');
 
 // 나는 Static 파일을 보관하기위해서 public 폴더를 쓸거다
 app.set('/public', express.static('public'));
 
-// PUT/DELETE 요청을 사용하기 위해서 Method Override를 사용한다.(설치필요 : npm install methode-override)
+// PUT/DELETE 요청을 사용하기 위해서 Method Override를 사용한다.(★★★★★설치필요 : npm install methode-override)
 const methodOverride = require('method-override');
 app.use(methodOverride('_method'));
 
-// 환경변수를 사용하기 위해서 
+// 환경변수를 사용하기 위해서 (★★★★★설치 필요 : npm i dotenv)
 require('dotenv').config();
- 
 
 
 // 몽고DB 접속 URI
@@ -72,63 +75,12 @@ MongoClient.connect(process.env.DB_URL, function(err, client){
   }) 
 //-----------------------------------------------------------------------------------------------
 
-
-app.get('/', function(요청, 응답) { 
-  응답.render('index.ejs');      // 응답값을 브라우져로 던지지 않음!
-})
-
-app.get('/write', function(요청, 응답) { 
-    응답.render('write.ejs');   // 응답값을 브라우져로 던지지 않음!
-});
-
-app.get('/list', function(요청, 응답) { 
-    Evaluate_People.find().toArray(function(에러, 결과){
-        console.log(결과);
-        응답.render('list.ejs', {people : 결과});
-    });
-});
-
-
-// Search 요청이 왔을 때 
-app.get('/search', function(요청, 응답) { 
-    //console.log(요청.query);
- 
-    var 검색조건 = [
-        { 
-            $search: {
-                index: 'titleName',
-                text:{
-                    query : 요청.query.value,
-                    path : "name"
-                }
-            }
-        },
-        {$sort : {_id : 1} },                                           // 소팅 기능(id 순으로)
-        {$limit : 10},                                                  // 데이터수 제한
-        {$project : { _id : 1, name : 1, score : {$meta : 'searchScore'}, },},    // 특정 조건에 맞게 찾아오기(제목 표시하고, 검색점수를 표시한다. )
-    ];
-    // 정규식 : 비슷한거 찾을 때 => /찾을내용/
-    // 빨리 찾고 싶으면 인덱스를 DB에 추가하고 아래와 같은 방식으로 명령을 주면 빨리 찾는다. 
-    // find가 아닌 aggregate사용한다(검색조건에 배열로 검색이 가능하다.)
-    Evaluate_People.aggregate(검색조건).toArray(function(에러, 결과){
-        console.log(결과);
-        응답.render('search.ejs', {posts : 결과});
-    });
-});
-
-
-
-
-
-
-
-
-
-
-
 // 세션 방식의 로그인 기능
 // 로그인 기능을 사용하기 위해서 3개의 라이브러리를 설치한다.
 // npm install passport passport-local express-session
+// (★★★★★설치 필요 : npm install passport)
+// (★★★★★설치 필요 : npm install passport-local)
+// (★★★★★설치 필요 : npm install express-session)
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const session = require('express-session');
@@ -198,6 +150,77 @@ passport.deserializeUser(function(아이디, done){
         done(null, 결과);
     });
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+app.get('/', function(요청, 응답) { 
+  응답.render('index.ejs');      // 응답값을 브라우져로 던지지 않음!
+})
+
+app.get('/write', function(요청, 응답) { 
+    응답.render('write.ejs');   // 응답값을 브라우져로 던지지 않음!
+});
+
+app.get('/list', function(요청, 응답) { 
+    Eval_Collect_People.find().toArray(function(에러, 결과){
+        console.log(결과);
+        응답.render('list.ejs', {people : 결과});
+    });
+});
+
+
+// Search 요청이 왔을 때 
+app.get('/search', function(요청, 응답) { 
+    //console.log(요청.query);
+ 
+    var 검색조건 = [
+        { 
+            $search: {
+                index: 'titleName',
+                text:{
+                    query : 요청.query.value,
+                    path : "name"
+                }
+            }
+        },
+        {$sort : {_id : 1} },                                           // 소팅 기능(id 순으로)
+        {$limit : 10},                                                  // 데이터수 제한
+        {$project : { _id : 1, name : 1, score : {$meta : 'searchScore'}, },},    // 특정 조건에 맞게 찾아오기(제목 표시하고, 검색점수를 표시한다. )
+    ];
+    // 정규식 : 비슷한거 찾을 때 => /찾을내용/
+    // 빨리 찾고 싶으면 인덱스를 DB에 추가하고 아래와 같은 방식으로 명령을 주면 빨리 찾는다. 
+    // find가 아닌 aggregate사용한다(검색조건에 배열로 검색이 가능하다.)
+    Eval_Collect_People.aggregate(검색조건).toArray(function(에러, 결과){
+        console.log(결과);
+        응답.render('search.ejs', {posts : 결과});
+    });
+});
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -459,7 +482,7 @@ app.use('/board', require('./routes/board.js'));
 
 
 
-
+// 파일 업로드를 하기 위해서(★★★★★설치 필요 : npm install --save multer)
 app.get('/upload', function(요청, 응답) { 
     응답.render('upload.ejs');
 });
