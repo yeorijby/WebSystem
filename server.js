@@ -34,27 +34,15 @@ let collectionCounter;
 let collectionLogin;
 let collectionChatroom;
 
-//===============================================================================================
-// 몽고DB 접속 구문 
-//===============================================================================================
-// // 기존 접속 구문
-// MongoClient.connect(uri, function(에러, client){
-//   if (에러) return console.log(에러);
-
-//   db = client.db("todoapp");
-
-//   collectionPost = db.collection('post');
-//   collectionCounter = db.collection('counter');
-
-
-//   app.listen(8080, function() {
-//     console.log('listening on 8080');
-//   });
-// })
 
 let db_Evaluate;
-let Eval_Collect_People;
-let Eval_Collect_Counter;
+let Evaluate_People;        // Evaluate.People
+let Evaluate_Counter;
+let Evaluate_Multiple_Choice;
+let Evaluate_Multiple_Choice_Detail;
+let Evaluate_SubjectiveExpression;
+
+//let Evaluate_Counter;
 // // env 파일 적용하는 몽고DB 접속 구문
 MongoClient.connect(process.env.DB_URL, function(err, client){
     if (err) 
@@ -67,12 +55,15 @@ MongoClient.connect(process.env.DB_URL, function(err, client){
     // collectionLogin = db.collection('login');
     // collectionChatroom = db.collection('chatroom');
 
-    
 
     db_Evaluate = client.db('evaluate');
     
-    Eval_Collect_People = db_Evaluate.collection('people');
-    Eval_Collect_Counter = db_Evaluate.collection('counter');
+    Evaluate_People = db_Evaluate.collection('people');
+    Evaluate_Counter = db_Evaluate.collection('counter');
+    Evaluate_Multiple_Choice = db_Evaluate.collection('MultipleChoice');
+    Evaluate_Multiple_Choice_Detail = db_Evaluate.collection('MultipleChoice_Detail');
+    Evaluate_SubjectiveExpression = db_Evaluate.collection('SubjectiveExpression');
+    
 
     
     app.listen(process.env.PORT, function() {
@@ -91,7 +82,7 @@ app.get('/write', function(요청, 응답) {
 });
 
 app.get('/list', function(요청, 응답) { 
-    Eval_Collect_People.find().toArray(function(에러, 결과){
+    Evaluate_People.find().toArray(function(에러, 결과){
         console.log(결과);
         응답.render('list.ejs', {people : 결과});
     });
@@ -119,7 +110,7 @@ app.get('/search', function(요청, 응답) {
     // 정규식 : 비슷한거 찾을 때 => /찾을내용/
     // 빨리 찾고 싶으면 인덱스를 DB에 추가하고 아래와 같은 방식으로 명령을 주면 빨리 찾는다. 
     // find가 아닌 aggregate사용한다(검색조건에 배열로 검색이 가능하다.)
-    Eval_Collect_People.aggregate(검색조건).toArray(function(에러, 결과){
+    Evaluate_People.aggregate(검색조건).toArray(function(에러, 결과){
         console.log(결과);
         응답.render('search.ejs', {posts : 결과});
     });
@@ -230,7 +221,7 @@ app.post('/add', function(req, res){
     res.redirect('/list'); 
 
   var item = { name : 'totalPeople' };
-  Eval_Collect_Counter.findOne(item, function(err1, result1) {
+  Evaluate_Counter.findOne(item, function(err1, result1) {
     
     // if (err1) 
     //     return console.log(err1);
@@ -247,10 +238,10 @@ app.post('/add', function(req, res){
     let objInsert = {_id : totalPeople + 1, name : req.body.name, institution : req.body.institution, age : req.body.age, counter : 0};
 
   
-    Eval_Collect_People.insertOne(objInsert, function(err2, result2){
+    Evaluate_People.insertOne(objInsert, function(err2, result2){
         console.log('넘어온 데이터 저장완료 : ', objInsert);
     
-        Eval_Collect_Counter.updateOne(item, {$inc : {totalCount : 1} }, function(err3, result3){
+        Evaluate_Counter.updateOne(item, {$inc : {totalCount : 1} }, function(err3, result3){
             if (err3)       return console.log(err3);
     
             //console.log("게시물 Counter가 수정되었습니다 => 결과 : ", 결과);
@@ -268,7 +259,7 @@ app.delete('/delete', function(요청, 응답) {
     // var 삭제할데이터 = {_id: 요청.body._id, 작성자_id : 요청.user._id};
     var 삭제할데이터 = {_id: 요청.body._id};
 
-    Eval_Collect_People.deleteOne(삭제할데이터, function(err, 결과){
+    Evaluate_People.deleteOne(삭제할데이터, function(err, 결과){
         if (err)       return console.log('에러 : ', err);
 
         console.log('삭제완료');
@@ -284,26 +275,79 @@ app.delete('/delete', function(요청, 응답) {
 app.get('/edit/:id', function(요청, 응답) { 
     // var id = parseInt(요청.body._id);
     var id = parseInt(요청.params.id);
-    // console.log('id : ',id);
+    //console.log('id : ',id);
 
-    Eval_Collect_People.findOne({_id : id}, function(에러, 결과){
+    
+
+    Evaluate_People.findOne({_id : id}, function(에러, 피플결과){
         if (에러) 
             return 응답.status(400).send({message : '실패했습니다.'});       // 2XX : 요청 성공, 4XX : 잘못된 요청으로 실패, 5XX : 서버의 문제  
         
-        // console.log('결과1 : ', 결과);
-        if (!결과)
+        //console.log('결과1 : ', 피플결과);
+        if (!피플결과)
         {
-            console.log('결과가 없습니다');
+            console.log('피플결과가 없습니다');
 
             //return 응답.redirect('/list');
-            return 응답.status(400).send({message : '결과가 없습니다.'});
+            return 응답.status(400).send({message : '피플결과가 없습니다.'});
         }
 
-        console.log('결과2 : ', 결과);
-        //console.log('응답 : ', 응답);
+        var Result = {People : 피플결과};
 
-        응답.render('edit.ejs', {data : 결과});
-        //return 응답.status(200).send({message : '성공하였습니다.'});
+        //console.log('결과2 : ', Result);
+
+
+        // let Evaluate_Multiple_Choice;
+        // let Evaluate_Multiple_Choice_Detail;
+        // let Evaluate_SubjectiveExpression;
+
+        Evaluate_Multiple_Choice.find().toArray(function(에러, 객관식결과){
+            //console.log(객관식결과);
+            if (!객관식결과)
+            {
+                console.log('객관식 결과가 없습니다');
+    
+                // 일단 피플의 결과만 표시할것 
+                응답.render('edit.ejs', {data : Result});
+            }
+
+            Result = { ...Result, MC: 객관식결과 };
+            //console.log('결과3 : ', Result);
+
+            Evaluate_Multiple_Choice_Detail.find().toArray(function(에러, 객관식디테일결과){
+                //console.log(객관식디테일결과);
+                if (!객관식디테일결과)
+                {
+                    console.log('객관식 결과가 없습니다');
+        
+                    // 일단 객관식의 결과만 표시할것 
+                    응답.render('edit.ejs', {data : Result});
+                }
+    
+                Result = { ...Result, MCD: 객관식디테일결과 };
+                //console.log('결과4 : ', Result);
+    
+                Evaluate_SubjectiveExpression.find().toArray(function(에러, 주관식결과){
+                    //console.log(주관식결과);
+                    if (!주관식결과)
+                    {
+                        console.log('객관식 디테일 결과가 없습니다');
+            
+                        // 일단 객관식 디테일의 결과만 표시할것 
+                        응답.render('edit.ejs', {data : Result});
+                    }
+        
+                    Result = { ...Result, SE: 주관식결과 };
+                    //console.log('결과5 : ', Result);
+        
+                    응답.render('edit.ejs', {data : Result});
+                    //console.log('결과6 : ', Result);
+                });                
+                // 응답.render('edit.ejs', {data : Result});
+            });
+            // 응답.render('edit.ejs', {data : Result});
+        });
+        // 응답.render('edit.ejs', {data : Result});
     });
 });
 
@@ -318,22 +362,7 @@ app.put('/edit', function(요청, 응답) {
     var age = 요청.body.age;
     var institution = 요청.body.institution;
 
-    // <input type="text" style="display: none;" name="id" value="<%= data._id %>">
-    // <input type="text" style="display: none;" name="counter" value="<%= data.counter %>">
-    // <div class="form-group">
-    //   <label>평가 대상자</label>
-    //   <input type="text" class="form-control" name="name" value="<%= data.name %>" readonly>
-    // </div>
-    // <div class="form-group">
-    //   <label>기관</label>
-    //   <input type="text" class="form-control" name="institution" value="<%= data.institution %>" readonly>
-    // </div>
-    // <div class="form-group">
-    //   <label>나이</label>
-    //   <input type="text" class="form-control" name="age" value="<%= data.age %>" readonly>
-    // </div>
-
-    Eval_Collect_People.updateOne({_id : id}, {$set : {제목 : title, 날짜 : date} }, function(에러, 결과){
+    Evaluate_People.updateOne({_id : id}, {$set : {제목 : title, 날짜 : date} }, function(에러, 결과){
         console.log('수정완료');
         응답.redirect('/list');
     });
