@@ -178,7 +178,7 @@ app.get('/write', function(요청, 응답) {
 });
 
 app.get('/list', function(요청, 응답) { 
-    Eval_Collect_People.find().toArray(function(에러, 결과){
+    Evaluate_People.find().toArray(function(에러, 결과){
         console.log(결과);
         응답.render('list.ejs', {people : 결과});
     });
@@ -206,7 +206,7 @@ app.get('/search', function(요청, 응답) {
     // 정규식 : 비슷한거 찾을 때 => /찾을내용/
     // 빨리 찾고 싶으면 인덱스를 DB에 추가하고 아래와 같은 방식으로 명령을 주면 빨리 찾는다. 
     // find가 아닌 aggregate사용한다(검색조건에 배열로 검색이 가능하다.)
-    Eval_Collect_People.aggregate(검색조건).toArray(function(에러, 결과){
+    Evaluate_People.aggregate(검색조건).toArray(function(에러, 결과){
         console.log(결과);
         응답.render('search.ejs', {posts : 결과});
     });
