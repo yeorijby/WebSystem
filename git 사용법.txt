@@ -9,3 +9,19 @@ git commit -m '메세지'  => 깃에대가 올리는 작업
 git branch 브랜치명     => 브렌치명에 해당하는 브렌치를 생성하는 기능 (create) 
 git switch 브렌치명     => 브렌치명으로 브렌치를 변경하는 기능 
 
+
+
+
+
+
+
+
+https://github.com/yeorijby/WebSystem.git
+
+git init
+git add *
+git commit -m "first commit"
+git branch -M main
+git remote remove origin
+git remote add origin https://github.com/yeorijby/WebSystem.git
+git push -u origin main

@@ -1,5 +1,6 @@
 // 코드 변경 될때마다 서버를 재시작 하는것이 귀찮을때 (★★★★★설치 필요 : npm install -g nodemon)
 
+
 // 서버를 쉽게 짤수있게 도와주는 라이브러리 (★★★★★설치 필요 : npm install express)
 const express = require('express');
 const app = express();
@@ -25,6 +26,8 @@ app.use(methodOverride('_method'));
 // 환경변수를 사용하기 위해서 (★★★★★설치 필요 : npm i dotenv)
 require('dotenv').config();
 
+// 현재시간 받아오기 위해 (★★★★★설치 필요 : npm install date-util)
+//require('date-util');                 // 동작하지 않아서 주석으로 처리 
 
 // 몽고DB 접속 URI
 const uri = "mongodb+srv://todoapp:todoapp@cluster0.fg8v9nz.mongodb.net/?retryWrites=true&w=majority";
@@ -37,13 +40,16 @@ let collectionCounter;
 let collectionLogin;
 let collectionChatroom;
 
+// Answer
 
 let db_Evaluate;
 let Evaluate_People;        // Evaluate.People
 let Evaluate_Counter;
+let Evaluate_Answer;
 let Evaluate_Multiple_Choice;
 let Evaluate_Multiple_Choice_Detail;
 let Evaluate_SubjectiveExpression;
+
 
 //let Evaluate_Counter;
 // // env 파일 적용하는 몽고DB 접속 구문
@@ -63,6 +69,7 @@ MongoClient.connect(process.env.DB_URL, function(err, client){
     
     Evaluate_People = db_Evaluate.collection('people');
     Evaluate_Counter = db_Evaluate.collection('counter');
+    Evaluate_Answer = db_Evaluate.collection('Answer');
     Evaluate_Multiple_Choice = db_Evaluate.collection('MultipleChoice');
     Evaluate_Multiple_Choice_Detail = db_Evaluate.collection('MultipleChoice_Detail');
     Evaluate_SubjectiveExpression = db_Evaluate.collection('SubjectiveExpression');
@@ -241,7 +248,7 @@ let totalPeople;
 app.post('/add', function(req, res){
   //console.log(요청.body);
 //  res.send('전송완료');      // => 맨 밑에서 함!
-    res.redirect('/list'); 
+//    res.redirect('/list'); 
 
   var item = { name : 'totalPeople' };
   Evaluate_Counter.findOne(item, function(err1, result1) {
@@ -379,17 +386,199 @@ app.get('/edit/:id', function(요청, 응답) {
 app.put('/edit', function(요청, 응답) { 
     console.log(요청.body);
 
-    var id = parseInt(요청.body.id);
-    var counter = 요청.body.counter;
-    var name = 요청.body.name;
-    var age = 요청.body.age;
-    var institution = 요청.body.institution;
 
-    Evaluate_People.updateOne({_id : id}, {$set : {제목 : title, 날짜 : date} }, function(에러, 결과){
-        console.log('수정완료');
-        응답.redirect('/list');
-    });
+    var id = parseInt(요청.body.id);
+    var counter = parseInt(요청.body.counter);
+    var name = 요청.body.name;
+    // var age = 요청.body.age;
+    // var institution = 요청.body.institution;
+
+    
+
+
+    //var newDate = new Date();
+    //var time = newDate.toFormat('YYYY-MM-DD HH24:MI:SS');
+    if (    요청.body.WSL === undefined
+        ||  요청.body.DBPL=== undefined
+        ||  요청.body.WDPL=== undefined
+        ||  요청.body.PRPL=== undefined
+        ||  요청.body.DNL === undefined
+        ||  요청.body.AAP === undefined
+        ||  요청.body.DPC === undefined
+        ||  요청.body.DVC === undefined
+        ||  요청.body.RPD === undefined
+        ||  요청.body.ECM === undefined
+        ||  요청.body.MDR === undefined
+        ||  요청.body.TMM === undefined
+        ||  요청.body.HLM === undefined
+        ||  요청.body.RPA === undefined
+        ||  요청.body.RFP === undefined
+        ||  요청.body.RCR === undefined
+        ||  요청.body.RAP === undefined
+        ||  요청.body.CSA === undefined
+        ||  요청.body.OBJ === undefined
+        ||  요청.body.RTN === undefined
+        ||  요청.body.UDS === undefined
+        ||  요청.body.DCM === undefined
+        ||  요청.body.CRT === undefined
+        ||  요청.body.LDS === undefined ){
+            return 응답.status(400).send({message : '선택되지 않은 객관식 항목이 있습니다.'});       // 2XX : 요청 성공, 4XX : 잘못된 요청으로 실패, 5XX : 서버의 문제  
+        }
+    // 1. Answer 에다가 Row 하나 Insert하기(날짜를 집어넣어야 할 것)
+    //    let objInsert = {_id : totalPeople + 1, name : req.body.name, institution : req.body.institution, age : req.body.age, 작성자_id : req.user._id, 작성자 : req.user.id, 작성자비번 : req.user.pw};
+    let objInsert = {   //evaluate_time : time, 
+                        people_id : id, people_name : name, 
+                        WSL : 요청.body.WSL, 
+                        DBPL: 요청.body.DBPL,
+                        WDPL: 요청.body.WDPL,
+                        PRPL: 요청.body.PRPL,
+                        DNL : 요청.body.DNL ,
+                        AAP : 요청.body.AAP ,
+                        DPC : 요청.body.DPC ,
+                        DVC : 요청.body.DVC ,
+                        RPD : 요청.body.RPD ,
+                        ECM : 요청.body.ECM ,
+                        MDR : 요청.body.MDR ,
+                        TMM : 요청.body.TMM ,
+                        HLM : 요청.body.HLM ,
+                        RPA : 요청.body.RPA ,
+                        RFP : 요청.body.RFP ,
+                        RCR : 요청.body.RCR ,
+                        RAP : 요청.body.RAP ,
+                        CSA : 요청.body.CSA ,
+                        OBJ : 요청.body.OBJ ,
+                        RTN : 요청.body.RTN ,
+                        UDS : 요청.body.UDS ,
+                        DCM : 요청.body.DCM ,
+                        CRT : 요청.body.CRT ,
+                        LDS : 요청.body.LDS 
+                    };
+
+    
+    Evaluate_Answer.insertOne(objInsert, function(err2, result2){
+        console.log('넘어온 데이터 저장완료 : ', objInsert);
+
+        // 2. People 에 다가 카운트 증가 시키기
+        Evaluate_People.updateOne({_id : id, name : name}, {$inc : {counter : 1} }, function(err3, result3){
+            if (err3)       
+                return console.log(err3);
+    
+            //console.log("게시물 Counter가 수정되었습니다 => 결과 : ", 결과);
+        });
+
+    });        
+    응답.redirect('/list'); 
 });
+
+
+app.get('/chart/:id', function(요청, 응답) { 
+    var id = parseInt(요청.params.id);
+    console.log('id : ', id);
+    // DB의 data를 가져와서 해당 항목1,2,3,4,5와, 데이터1에 실제 값을 입력할것
+    Evaluate_Answer.find({people_id : id}).toArray(function(에러, 결과){
+        //Evaluate_People.find({_id : id}, function(에러, 피플결과){
+        if (에러) 
+            return 응답.status(400).send({message : '실패했습니다.'});       // 2XX : 요청 성공, 4XX : 잘못된 요청으로 실패, 5XX : 서버의 문제  
+        
+        // console.log('결과1 : ', 결과);
+        if (!결과)
+        {
+            console.log('피플결과가 없습니다');
+
+            //return 응답.redirect('/list');
+            return 응답.status(400).send({message : '피플결과가 없습니다.'});
+        }
+        var Result = {Answer : 결과};
+
+        const feildName = Object.keys(결과);
+
+        console.log('필드이름 : ', feildName);   
+
+        // Evaluate_Multiple_Choice.find().toArray(function(에러, 객관식결과){
+        //     //console.log(객관식결과);
+        //     if (!객관식결과)
+        //     {
+        //         console.log('객관식 결과가 없습니다');
+    
+        //         // 일단 피플의 결과만 표시할것 
+        //         응답.render('edit.ejs', {data : Result});
+        //     }
+
+        //     Result = { ...Result, MC: 객관식결과 };
+        //     //console.log('결과3 : ', Result);
+
+        //     Evaluate_Multiple_Choice_Detail.find().toArray(function(에러, 객관식디테일결과){
+        //         //console.log(객관식디테일결과);
+        //         if (!객관식디테일결과)
+        //         {
+        //             console.log('객관식 결과가 없습니다');
+        
+        //             // 일단 객관식의 결과만 표시할것 
+        //             응답.render('edit.ejs', {data : Result});
+        //         }
+    
+        //         Result = { ...Result, MCD: 객관식디테일결과 };
+        //         //console.log('결과4 : ', Result);
+    
+        //         var sum = 0;
+        //         for (var i = 0; i <객관식결과.length; i++) {
+        //             for (var j = 0; j <객관식디테일결과.length; j++) {
+        //                 if (객관식결과[i].LargeQuestion_Code === 객관식디테일결과[j].LQ_Code) {
+                            
+        //                     sum = sum + 
+        //                 }        
+        //             }
+        //         }
+                
+
+
+
+        //         Evaluate_SubjectiveExpression.find().toArray(function(에러, 주관식결과){
+        //             //console.log(주관식결과);
+        //             if (!주관식결과)
+        //             {
+        //                 console.log('객관식 디테일 결과가 없습니다');
+            
+        //                 // 일단 객관식 디테일의 결과만 표시할것 
+        //                 응답.render('edit.ejs', {data : Result});
+        //             }
+        
+        //             Result = { ...Result, SE: 주관식결과 };
+        //             //console.log('결과5 : ', Result);
+        
+        //             응답.render('edit.ejs', {data : Result});
+        //             //console.log('결과6 : ', Result);
+        //         });                
+        //         // 응답.render('edit.ejs', {data : Result});
+        //     });
+        //     // 응답.render('edit.ejs', {data : Result});
+        // });
+        // 응답.render('edit.ejs', {data : Result});
+    });
+
+
+
+
+    const data = {
+        labels: ['항목1', '항목2', '항목3', '항목4', '항목5'],
+        datasets: [
+          {
+            label: '데이터1',
+            data: [3, 5, 2, 4, 1],
+            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+            borderColor: 'rgba(255, 99, 132, 1)',
+            borderWidth: 1,
+          },
+          // 추가 데이터셋을 필요에 따라 설정할 수 있습니다.
+        ],
+    };
+    console.log('챠트로 들어왔음');
+
+    응답.render('chart.ejs', { data });
+});
+
+
+
 /*
 
 app.get('/detail/:id', function(요청, 응답) { 

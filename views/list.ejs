@@ -50,7 +50,7 @@
             <h4>이름 : <%= people[i].name %> </h4>
             <P>기관 : <%= people[i].institution %> </P>
             <P>평가 횟수 : <%= people[i].counter %> </P>
-            <!-- <button class="btn btn-info put" data-id="<%= people[i]._id %>">평가하기</button> -->
+            <button class="btn btn-info put" data-id="<%= people[i]._id %>">평가내용</button>
             <button class="btn btn-danger delete" data-id="<%= people[i]._id %>">삭제</button>
             <!-- <button class="btn btn-danger chat" data-id="<%= people[i]._id %>" data-id-user="<%= people[i].작성자 %>">채팅하기</button> -->
           </a>
@@ -98,7 +98,7 @@
           $('.put').click(function(e){
             var 임시글번호 = e.target.dataset.id; 
             //var 방금누른거 = $(this);
-            var 임시유알엘 = '/edit/' + 임시글번호;
+            var 임시유알엘 = '/chart/' + 임시글번호;
             
             //console.log("글번호 : ", e.target.dataset.id);
             // console.log("임시유알엘 : ", 임시유알엘);
