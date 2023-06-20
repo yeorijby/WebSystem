@@ -1,0 +1,24 @@
+<script>
+  //alert(<%= loginUser%>);
+</script>
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <% if(loginUser){ %>
+      <a class="navbar-brand" href="/mypage"><b> <%= loginUser.id %> </b></a>
+    <%} else {%>
+      <a class="navbar-brand" href="/"><b>Guest</b></a>      
+    <% } %>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+      <div class="navbar-nav">
+        <a class="nav-link" href="/">Administrator <span class="sr-only">(current)</span></a>
+        <a class="nav-link active" href="/list">List</a>
+        <a class="nav-link" href="/write">Write</a>
+        <a class="nav-link" href="/login">login</a>
+        <a class="nav-link" href="/chart">chart</a>
+      </div>
+    </div>
+  </nav>    <!-- Optional JavaScript; choose one of the two! -->
+

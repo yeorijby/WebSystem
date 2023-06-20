@@ -46,6 +46,7 @@ let db_Evaluate;
 let Evaluate_People;        // Evaluate.People
 let Evaluate_Counter;
 let Evaluate_Answer;
+let Evaluate_Login;
 let Evaluate_Multiple_Choice;
 let Evaluate_Multiple_Choice_Detail;
 let Evaluate_SubjectiveExpression;
@@ -70,6 +71,7 @@ MongoClient.connect(process.env.DB_URL, function(err, client){
     Evaluate_People = db_Evaluate.collection('people');
     Evaluate_Counter = db_Evaluate.collection('counter');
     Evaluate_Answer = db_Evaluate.collection('Answer');
+    Evaluate_Login = db_Evaluate.collection('login');
     Evaluate_Multiple_Choice = db_Evaluate.collection('MultipleChoice');
     Evaluate_Multiple_Choice_Detail = db_Evaluate.collection('MultipleChoice_Detail');
     Evaluate_SubjectiveExpression = db_Evaluate.collection('SubjectiveExpression');
@@ -106,11 +108,14 @@ app.get('/login', function(요청, 응답){
 // 인증할때 local 방식으로 인증한다. 
 // failureRedirect : '/fail' 는 실패했을 때 '/fail'이라는 곳으로 간다. 
 app.post('/login', passport.authenticate('local', { failureRedirect : '/fail' }), function(요청, 응답){
-    응답.redirect('/');
+    //var id = parseInt(요청.user.id);
+    console.log(요청.user);
+    응답.render('index.ejs', {loginUser : 요청.user});
+    //응답.redirect('/');
 });
 
 
-
+ 
 app.get('/mypage', 로그인했니, function(요청, 응답){
     console.log(요청.user);
     응답.render('mypage.ejs', {사용자 : 요청.user});
@@ -134,11 +139,11 @@ passport.use(new LocalStrategy({
     passReqToCallback: false,
   }, function (입력한아이디, 입력한비번, done) {
     //console.log(입력한아이디, 입력한비번);
-    collectionLogin.findOne({ id: 입력한아이디 }, function (에러, 결과) {
+    Evaluate_Login.findOne({ id: 입력한아이디 }, function (에러, 결과) {
       if (에러) return done(에러);
   
       if (!결과) return done(null, false, { message: '존재하지않는 아이디요' });
-      if (입력한비번 == 결과.pw) {
+      if (입력한비번 == 결과.pw) {                                  //비번 암호과가 필요함
         return done(null, 결과);
       } else {
         return done(null, false, { message: '비번틀렸어요' });
@@ -147,13 +152,15 @@ passport.use(new LocalStrategy({
   }));
 
 
-// 세션을 만들어야 한다. 
+// 세션을 만들어야 한다. - 새션을 만들때 user.id를 암호화하여 저장(브라우져상의 쿠키로)한다.  
 passport.serializeUser(function(user, done){
     done(null, user.id);
 });
+
+// 세션에서 사용자 정보를 가져온다 - user.id를 새션을 통해서 가져올때 복호화하여 불러온다.  
 passport.deserializeUser(function(아이디, done){
     // db에서 위에 있는 user.id를 유저를 찾은 뒤에 유저 정보를 
-    collectionLogin.findOne({ id: 아이디 }, function (에러, 결과) {
+    Evaluate_Login.findOne({ id: 아이디 }, function (에러, 결과) {
         done(null, 결과);
     });
 });
@@ -177,7 +184,11 @@ passport.deserializeUser(function(아이디, done){
 
 
 app.get('/', function(요청, 응답) { 
-  응답.render('index.ejs');      // 응답값을 브라우져로 던지지 않음!
+    var id = parseInt(요청.params.id);
+    console.log('/에서 id : ', 요청.user);
+    //console.log('/에서 id : ',id);
+    
+    응답.render('index.ejs');      // 응답값을 브라우져로 던지지 않음!
 })
 
 app.get('/write', function(요청, 응답) { 
@@ -191,7 +202,7 @@ app.get('/list', function(요청, 응답) {
     });
 });
 
-
+ 
 // Search 요청이 왔을 때 
 app.get('/search', function(요청, 응답) { 
     //console.log(요청.query);
@@ -218,21 +229,6 @@ app.get('/search', function(요청, 응답) {
         응답.render('search.ejs', {posts : 결과});
     });
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -305,9 +301,7 @@ app.delete('/delete', function(요청, 응답) {
 app.get('/edit/:id', function(요청, 응답) { 
     // var id = parseInt(요청.body._id);
     var id = parseInt(요청.params.id);
-    //console.log('id : ',id);
-
-    
+    console.log('id : ',id);
 
     Evaluate_People.findOne({_id : id}, function(에러, 피플결과){
         if (에러) 
@@ -325,11 +319,6 @@ app.get('/edit/:id', function(요청, 응답) {
         var Result = {People : 피플결과};
 
         //console.log('결과2 : ', Result);
-
-
-        // let Evaluate_Multiple_Choice;
-        // let Evaluate_Multiple_Choice_Detail;
-        // let Evaluate_SubjectiveExpression;
 
         Evaluate_Multiple_Choice.find().toArray(function(에러, 객관식결과){
             //console.log(객관식결과);
@@ -576,166 +565,3 @@ app.get('/chart/:id', function(요청, 응답) {
 
     응답.render('chart.ejs', { data });
 });
-
-
-
-/*
-
-app.get('/detail/:id', function(요청, 응답) { 
-
-    var id = parseInt(요청.params.id);
-    collectionPost.findOne({_id : id}, function(에러, 결과){
-        if (에러) 
-            return 응답.status(400).send({message : '실패했습니다.'});       // 2XX : 요청 성공, 4XX : 잘못된 요청으로 실패, 5XX : 서버의 문제  
-        
-        응답.render('detail.ejs', {data : 결과});
-    });
-});
-
-
-
-
-
-// 목록페이지(List.ejs) 수정버튼이 눌러졌을 때 수정 페이지(해당 글번호의 값을 불러와서 폼)를 띄우는 기능 구현
-app.put('/edit', function(요청, 응답) { 
-    // console.log(요청.params.id);
-    //console.log(요청.body);
-    // 응답.render('edit.ejs');
-
-    var id = parseInt(요청.body._id);
-    console.log(id);
-
-    collectionPost.findOne({_id : id}, function(에러, 결과){
-        if (에러) 
-            return 응답.status(400).send({message : '실패했습니다.'});       // 2XX : 요청 성공, 4XX : 잘못된 요청으로 실패, 5XX : 서버의 문제  
-        
-        //console.log(결과);
-        if (!결과)
-        {
-            console.log('결과가 없습니다');
-
-            //return 응답.redirect('/list');
-            return 응답.status(400).send({message : '결과가 없습니다.'});
-        }
-
-        //응답.redirect('/edit', {data : 결과}); 
-        응답.render('edit.ejs', {data : 결과});
-        //return 응답.status(200).send({message : '성공하였습니다.'});
-    });
-});
-
-// app.put('modify', function(요청, 응답){
-//     console.log(요청.body);
-
-//     var id = parseInt(요청.body.id);
-//     var title = 요청.body.title;
-//     var date = 요청.body.date;
-
-//     collectionPost.updateOne({_id : id}, {$set : {제목 : title, 날짜 : date} }, function(에러, 결과){
-//         console.log('수정완료');
-//         응답.redirect('/list');
-//     });
-// });
-
-
-
-// 회원 가입하는 거 - 패스포트보다 밑에 있어야 할듯! 
-app.post('/register', function(요청, 응답){
-    // id에 알파벳과 숫자만 들어있나? - 이거는 Login.ejs에서 할부분인듯!
-    
-    // 요청한 ID 가 현재 존재하는 ID 인지 확인해야 함!
-    collectionLogin.findOne({ id: 요청.body.id }, function (에러, 결과) {
-        if (에러) 
-            return done(에러);
-            
-    
-        if (결과) 
-            응답.send("존재하는 아이디요"); 
-
-    })
-
-    // 비밀번호 저장 전에 암호화 해야함! - 현재는 생략 
-
-    // 실제 회원 목록에 추가 
-    collectionLogin.insertOne({id : 요청.body.id, pw : 요청.body.pw}, function(에러, 결과){
-        응답.redirect('/list', {register : 요청.body.id});
-    });
-});
-
-
-// app.use 미들 웨어를 사용하고 싶을때 쓰는 문법 
-app.use('/shop', require('./routes/shop.js'));
-
-// app.use 미들 웨어를 사용하고 싶을때 쓰는 문법 
-app.use('/board', require('./routes/board.js'));
-
-
-
-// 파일 업로드를 하기 위해서(★★★★★설치 필요 : npm install --save multer)
-app.get('/upload', function(요청, 응답) { 
-    응답.render('upload.ejs');
-});
-
-
-
-let multer = require('multer');
-var storage = multer.diskStorage({
-    destination: function(req, file, cb) {
-        cb(null, './public/image');
-    },
-    filename: function(req, file, cb) {
-        cb(null, file.originalname);
-    },
-    // 특정 확장자의 파일만 업로드 할수있게 하고 싶을 때 
-    filefilter: function(req, file, cb) {
-        var ext = path.extname(file.originalname);
-        if(ext !== '.png' && ext !== '.jpg' && ext !== '.jpeg') {
-            return callback(new Error('PNG, JPG만 업로드하세요'));
-        }
-        callback(null, true);
-    },
-    // 파일 사이즈 제한 : 1024 * 1024는 1MB를 뜻함
-    limits:{
-        filesize: 1024 * 1024
-    }
-});
-
-var upload = multer({storage : storage});
-
-// 파일을 한개만 올릴때 => upload.single('input의name')
-// 파일을 여러개 올릴때 => upload.array('input의name', 한번에올릴최대갯수)
-app.post('/upload', upload.array('profile', 10), function(요청, 응답){
-    응답.send('Upload Success');
-});
-
-
-app.get('/image/:imageName', function(요청, 응답){
-    응답.sendFile( __dirname + '/public/image/' + 요청.params.imageName );
-});
-
-
-app.post('/chat', function(요청, 응답){
-    // id에 알파벳과 숫자만 들어있나? - 이거는 Login.ejs에서 할부분인듯!
-//    let objInsert = {_id : 총게시물갯수 + 1, 제목 : 요청.body.title, 날짜 : date, 작성자_id : 요청.user._id, 작성자 : 요청.user.id, 작성자비번 : 요청.user.pw};
-    console.log(요청.user);
-
-    let members = {0 : 요청.body.user, 1 : 요청.user.id};
-    console.log(members);
-
-    let theDate = new Date();
-    console.log(theDate);
-
-
-    let objInsert = {member : members, date : theDate, title : '아무거나' + 1};
-
-    console.log(objInsert);
-
-    collectionChatroom.insertOne(objInsert, function(에러, 결과){
-        응답.render('chat.ejs');
-    });
-});
-
-app.get('/chat', function(요청, 응답){
-    응답.render('chat.ejs');
-});
-//*/
