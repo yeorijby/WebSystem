@@ -387,63 +387,63 @@ app.put('/edit', function(요청, 응답) {
 
     //var newDate = new Date();
     //var time = newDate.toFormat('YYYY-MM-DD HH24:MI:SS');
-    if (    요청.body.WSL === undefined
-        ||  요청.body.DBPL=== undefined
-        ||  요청.body.WDPL=== undefined
-        ||  요청.body.PRPL=== undefined
-        ||  요청.body.DNL === undefined
-        ||  요청.body.AAP === undefined
-        ||  요청.body.DPC === undefined
-        ||  요청.body.DVC === undefined
-        ||  요청.body.RPD === undefined
-        ||  요청.body.ECM === undefined
-        ||  요청.body.MDR === undefined
-        ||  요청.body.TMM === undefined
-        ||  요청.body.HLM === undefined
-        ||  요청.body.RPA === undefined
-        ||  요청.body.RFP === undefined
-        ||  요청.body.RCR === undefined
-        ||  요청.body.RAP === undefined
-        ||  요청.body.CSA === undefined
-        ||  요청.body.OBJ === undefined
-        ||  요청.body.RTN === undefined
-        ||  요청.body.UDS === undefined
-        ||  요청.body.DCM === undefined
-        ||  요청.body.CRT === undefined
-        ||  요청.body.LDS === undefined ){
+    if (    요청.body.SL_WSL === undefined
+        ||  요청.body.SL_DBPL=== undefined
+        ||  요청.body.SL_WDPL=== undefined
+        ||  요청.body.SL_PRPL=== undefined
+        ||  요청.body.SL_DNL === undefined
+        ||  요청.body.CR_AAP === undefined
+        ||  요청.body.CR_DPC === undefined
+        ||  요청.body.CR_DVC === undefined
+        ||  요청.body.CR_RPD === undefined
+        ||  요청.body.SC_ECM === undefined
+        ||  요청.body.SC_MDR === undefined
+        ||  요청.body.SC_TMM === undefined
+        ||  요청.body.SC_HLM === undefined
+        ||  요청.body.PF_CSA === undefined
+        ||  요청.body.PF_OBJ === undefined
+        ||  요청.body.PF_RTN === undefined
+        ||  요청.body.PF_UDS === undefined
+        ||  요청.body.PF_DCM === undefined
+        ||  요청.body.PF_CRT === undefined
+        ||  요청.body.PF_LDS === undefined
+        ||  요청.body.RS_RPA === undefined
+        ||  요청.body.RS_RFP === undefined
+        ||  요청.body.RS_RCR === undefined
+        ||  요청.body.RS_RAP === undefined ){
             return 응답.status(400).send({message : '선택되지 않은 객관식 항목이 있습니다.'});       // 2XX : 요청 성공, 4XX : 잘못된 요청으로 실패, 5XX : 서버의 문제  
         }
+        
     // 1. Answer 에다가 Row 하나 Insert하기(날짜를 집어넣어야 할 것)
     //    let objInsert = {_id : totalPeople + 1, name : req.body.name, institution : req.body.institution, age : req.body.age, 작성자_id : req.user._id, 작성자 : req.user.id, 작성자비번 : req.user.pw};
     let objInsert = {   //evaluate_time : time, 
                         people_id : id, people_name : name, 
-                        WSL : 요청.body.WSL, 
-                        DBPL: 요청.body.DBPL,
-                        WDPL: 요청.body.WDPL,
-                        PRPL: 요청.body.PRPL,
-                        DNL : 요청.body.DNL ,
-                        AAP : 요청.body.AAP ,
-                        DPC : 요청.body.DPC ,
-                        DVC : 요청.body.DVC ,
-                        RPD : 요청.body.RPD ,
-                        ECM : 요청.body.ECM ,
-                        MDR : 요청.body.MDR ,
-                        TMM : 요청.body.TMM ,
-                        HLM : 요청.body.HLM ,
-                        RPA : 요청.body.RPA ,
-                        RFP : 요청.body.RFP ,
-                        RCR : 요청.body.RCR ,
-                        RAP : 요청.body.RAP ,
-                        CSA : 요청.body.CSA ,
-                        OBJ : 요청.body.OBJ ,
-                        RTN : 요청.body.RTN ,
-                        UDS : 요청.body.UDS ,
-                        DCM : 요청.body.DCM ,
-                        CRT : 요청.body.CRT ,
-                        LDS : 요청.body.LDS 
+                        SL_WSL :요청.body.SL_WSL , 
+                        SL_DBPL:요청.body.SL_DBPL,
+                        SL_WDPL:요청.body.SL_WDPL,
+                        SL_PRPL:요청.body.SL_PRPL,
+                        SL_DNL :요청.body.SL_DNL ,
+                        CR_AAP :요청.body.CR_AAP ,
+                        CR_DPC :요청.body.CR_DPC ,
+                        CR_DVC :요청.body.CR_DVC ,
+                        CR_RPD :요청.body.CR_RPD ,
+                        SC_ECM :요청.body.SC_ECM ,
+                        SC_MDR :요청.body.SC_MDR ,
+                        SC_TMM :요청.body.SC_TMM ,
+                        SC_HLM :요청.body.SC_HLM ,
+                        PF_CSA :요청.body.PF_CSA ,
+                        PF_OBJ :요청.body.PF_OBJ ,
+                        PF_RTN :요청.body.PF_RTN ,
+                        PF_UDS :요청.body.PF_UDS ,
+                        PF_DCM :요청.body.PF_DCM ,
+                        PF_CRT :요청.body.PF_CRT ,
+                        PF_LDS :요청.body.PF_LDS ,
+                        RS_RPA :요청.body.RS_RPA ,
+                        RS_RFP :요청.body.RS_RFP ,
+                        RS_RCR :요청.body.RS_RCR ,
+                        RS_RAP :요청.body.RS_RAP 
                     };
-
-    
+                    
     Evaluate_Answer.insertOne(objInsert, function(err2, result2){
         console.log('넘어온 데이터 저장완료 : ', objInsert);
 

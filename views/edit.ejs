@@ -60,7 +60,7 @@
                 <div class="row">
                   <div class="col">
                     <% //console.log("미들._id:", MCD._id, "미들.라지코드:", MCD.LQ_Code, "미들.미들코드:", MCD.MiddleQusetion_Code, "미들.콘텐츠:", MCD.MiddleQuestion_Content, "번호 : ", j);   %>
-                    <% var MQ_CODE =  MCD.LQ_Code + "-" + MCD.MiddleQusetion_Code %>
+                    <% var MQ_CODE =  MCD.LQ_Code + "_" + MCD.MiddleQusetion_Code %>
                     <% var MQ_CODE_Answer = "Answer_" + MQ_CODE %>
                     <p>   (<%= j++ %>) <%= MCD.MiddleQuestion_Content %></p>
                   </div>
@@ -83,16 +83,16 @@
                       </label>  
                     </div>                   
                   </div>
-                  <div class="col">
+                  <!-- <div class="col">
                     <input type="text" name="<%= MQ_CODE_Answer %>" placeholder="<%= MQ_CODE_Answer %>" onblur='sumLQ(event, <%= sum %>)'>
-                  </div>                   
+                  </div>                    -->
                 </div>
                 <% }%>
               <% }) %>
               <br>
-              <div class="row">
+              <!-- <div class="row">
                 <input type="text" name="<%= LQ_CODE %>" value="">
-              </div>                            
+              </div>                             -->
               <br>
               <br>  
               <br>              
