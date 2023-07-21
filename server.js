@@ -46,6 +46,7 @@ let db_Evaluate;
 let Evaluate_People;        // Evaluate.People
 let Evaluate_Counter;
 let Evaluate_Answer;
+let Evaluate_Answer_SUM;
 let Evaluate_Login;
 let Evaluate_Multiple_Choice;
 let Evaluate_Multiple_Choice_Detail;
@@ -71,12 +72,13 @@ MongoClient.connect(process.env.DB_URL, function(err, client){
     Evaluate_People = db_Evaluate.collection('people');
     Evaluate_Counter = db_Evaluate.collection('counter');
     Evaluate_Answer = db_Evaluate.collection('Answer');
+    Evaluate_Answer_SUM = db_Evaluate.collection('Answer_SUM');
     Evaluate_Login = db_Evaluate.collection('login');
     Evaluate_Multiple_Choice = db_Evaluate.collection('MultipleChoice');
     Evaluate_Multiple_Choice_Detail = db_Evaluate.collection('MultipleChoice_Detail');
     Evaluate_SubjectiveExpression = db_Evaluate.collection('SubjectiveExpression');
     
-
+    Evaluate_Answer_SUM
     
     app.listen(process.env.PORT, function() {
       console.log('listening on' + process.env.PORT);
@@ -413,7 +415,11 @@ app.put('/edit', function(요청, 응답) {
         ||  요청.body.RS_RAP === undefined ){
             return 응답.status(400).send({message : '선택되지 않은 객관식 항목이 있습니다.'});       // 2XX : 요청 성공, 4XX : 잘못된 요청으로 실패, 5XX : 서버의 문제  
         }
+    
         
+        
+
+
     // 1. Answer 에다가 Row 하나 Insert하기(날짜를 집어넣어야 할 것)
     //    let objInsert = {_id : totalPeople + 1, name : req.body.name, institution : req.body.institution, age : req.body.age, 작성자_id : req.user._id, 작성자 : req.user.id, 작성자비번 : req.user.pw};
     let objInsert = {   //evaluate_time : time, 
@@ -452,6 +458,16 @@ app.put('/edit', function(요청, 응답) {
             if (err3)       
                 return console.log(err3);
     
+            // // 3. 섬에 저장   
+            // if (counter === 0){
+            //     // 3.1. 처음 평가하게 되는 사람 => Insert
+            //     Evaluate_Answer_SUM.insertOne(objInsert, function(err2, result2){
+            //         console.log('넘어온 데이터 저장완료 : ', objInsert);
+            //     });
+            // } else { 
+            //     // 3.2. 이미 평가했던 사람 => SUM
+
+            // }
             //console.log("게시물 Counter가 수정되었습니다 => 결과 : ", 결과);
         });
 
@@ -463,13 +479,14 @@ app.put('/edit', function(요청, 응답) {
 app.get('/chart/:id', function(요청, 응답) { 
     var id = parseInt(요청.params.id);
     console.log('id : ', id);
+
     // DB의 data를 가져와서 해당 항목1,2,3,4,5와, 데이터1에 실제 값을 입력할것
     Evaluate_Answer.find({people_id : id}).toArray(function(에러, 결과){
         //Evaluate_People.find({_id : id}, function(에러, 피플결과){
         if (에러) 
             return 응답.status(400).send({message : '실패했습니다.'});       // 2XX : 요청 성공, 4XX : 잘못된 요청으로 실패, 5XX : 서버의 문제  
         
-        // console.log('결과1 : ', 결과);
+        //console.log('결과 : ', 결과);
         if (!결과)
         {
             console.log('피플결과가 없습니다');
@@ -477,73 +494,86 @@ app.get('/chart/:id', function(요청, 응답) {
             //return 응답.redirect('/list');
             return 응답.status(400).send({message : '피플결과가 없습니다.'});
         }
-        var Result = {Answer : 결과};
 
-        const feildName = Object.keys(결과);
-
-        console.log('필드이름 : ', feildName);   
-
-        // Evaluate_Multiple_Choice.find().toArray(function(에러, 객관식결과){
-        //     //console.log(객관식결과);
-        //     if (!객관식결과)
-        //     {
-        //         console.log('객관식 결과가 없습니다');
+        var 평가합계 = [
+            {$match : { people_id : id}}, 
+            {$group : { name :"$people_name", 
+                        TOT_SL_WSL : { $sum : '$결과.SL_WSL '}, 
+                        TOT_SL_DBPL: { $sum : '$결과.SL_DBPL'},
+                        TOT_SL_WDPL: { $sum : '$결과.SL_WDPL'},
+                        TOT_SL_PRPL: { $sum : '$결과.SL_PRPL'},
+                        TOT_SL_DNL : { $sum : '$결과.SL_DNL '},
+                        TOT_CR_AAP : { $sum : '$결과.CR_AAP '},
+                        TOT_CR_DPC : { $sum : '$결과.CR_DPC '},
+                        TOT_CR_DVC : { $sum : '$결과.CR_DVC '},
+                        TOT_CR_RPD : { $sum : '$결과.CR_RPD '},
+                        TOT_SC_ECM : { $sum : '$결과.SC_ECM '},
+                        TOT_SC_MDR : { $sum : '$결과.SC_MDR '},
+                        TOT_SC_TMM : { $sum : '$결과.SC_TMM '},
+                        TOT_SC_HLM : { $sum : '$결과.SC_HLM '},
+                        TOT_PF_CSA : { $sum : '$결과.PF_CSA '},
+                        TOT_PF_OBJ : { $sum : '$결과.PF_OBJ '},
+                        TOT_PF_RTN : { $sum : '$결과.PF_RTN '},
+                        TOT_PF_UDS : { $sum : '$결과.PF_UDS '},
+                        TOT_PF_DCM : { $sum : '$결과.PF_DCM '},
+                        TOT_PF_CRT : { $sum : '$결과.PF_CRT '},
+                        TOT_PF_LDS : { $sum : '$결과.PF_LDS '},
+                        TOT_RS_RPA : { $sum : '$결과.RS_RPA '},
+                        TOT_RS_RFP : { $sum : '$결과.RS_RFP '},
+                        TOT_RS_RCR : { $sum : '$결과.RS_RCR '},
+                        TOT_RS_RAP : { $sum : '$결과.RS_RAP '}
+                      }}
+        ];
     
-        //         // 일단 피플의 결과만 표시할것 
-        //         응답.render('edit.ejs', {data : Result});
-        //     }
-
-        //     Result = { ...Result, MC: 객관식결과 };
-        //     //console.log('결과3 : ', Result);
-
-        //     Evaluate_Multiple_Choice_Detail.find().toArray(function(에러, 객관식디테일결과){
-        //         //console.log(객관식디테일결과);
-        //         if (!객관식디테일결과)
-        //         {
-        //             console.log('객관식 결과가 없습니다');
-        
-        //             // 일단 객관식의 결과만 표시할것 
-        //             응답.render('edit.ejs', {data : Result});
-        //         }
-    
-        //         Result = { ...Result, MCD: 객관식디테일결과 };
-        //         //console.log('결과4 : ', Result);
-    
-        //         var sum = 0;
-        //         for (var i = 0; i <객관식결과.length; i++) {
-        //             for (var j = 0; j <객관식디테일결과.length; j++) {
-        //                 if (객관식결과[i].LargeQuestion_Code === 객관식디테일결과[j].LQ_Code) {
-                            
-        //                     sum = sum + 
-        //                 }        
-        //             }
-        //         }
+        Evaluate_Answer.aggregate(평가합계).toArray(function (에러1, 결과1) {
+            // if (에러1) 
+            //     return 응답.status(400).send({message : '실패했습니다.'});       // 2XX : 요청 성공, 4XX : 잘못된 요청으로 실패, 5XX : 서버의 문제  
                 
+            console.log(결과1);
+        });
 
-
-
-        //         Evaluate_SubjectiveExpression.find().toArray(function(에러, 주관식결과){
-        //             //console.log(주관식결과);
-        //             if (!주관식결과)
-        //             {
-        //                 console.log('객관식 디테일 결과가 없습니다');
-            
-        //                 // 일단 객관식 디테일의 결과만 표시할것 
-        //                 응답.render('edit.ejs', {data : Result});
-        //             }
-        
-        //             Result = { ...Result, SE: 주관식결과 };
-        //             //console.log('결과5 : ', Result);
-        
-        //             응답.render('edit.ejs', {data : Result});
-        //             //console.log('결과6 : ', Result);
-        //         });                
-        //         // 응답.render('edit.ejs', {data : Result});
-        //     });
-        //     // 응답.render('edit.ejs', {data : Result});
-        // });
-        // 응답.render('edit.ejs', {data : Result});
     });
+
+
+    // // DB의 data를 가져와서 해당 항목1,2,3,4,5와, 데이터1에 실제 값을 입력할것
+    // Evaluate_Answer.find({people_id : id}).toArray(function(에러, 결과){
+    //     //Evaluate_People.find({_id : id}, function(에러, 피플결과){
+    //     if (에러) 
+    //         return 응답.status(400).send({message : '실패했습니다.'});       // 2XX : 요청 성공, 4XX : 잘못된 요청으로 실패, 5XX : 서버의 문제  
+        
+    //     // console.log('결과1 : ', 결과);
+    //     if (!결과)
+    //     {
+    //         console.log('피플결과가 없습니다');
+
+    //         //return 응답.redirect('/list');
+    //         return 응답.status(400).send({message : '피플결과가 없습니다.'});
+    //     }
+    //     // var Result = {Answer : 결과};
+
+        
+
+
+    //     // 개인당 설문 횟수에 대한 반복문 : 3명이 이사람을 평가했다 => 3번
+    //     결과.forEach(function(Answer, Answer_index) {
+
+    //         console.log('Answer : ', Answer);
+    //         console.log('Answer_Length : ', Answer.length);
+    //         // // 개인당 설문의 질문 수에 대한 반복문 : 질문이 20개 => 20번
+    //         // Answer.forEach(function(Feild, Feild_index){
+    //         //     const feildName = Object.keys(Feild);
+
+    //         //     //const str = 'ABC_AAA';
+    //         //     const isAllUpperCase = /^[A-Z_]+$/.test(feildName);
+    
+    
+    //         //     console.log(isAllUpperCase); // true or false
+    
+    //         //     console.log('필드이름 : ', feildName, "객관식 여부 : ", isAllUpperCase);
+    
+    //         // })
+    //     });
+    // });
 
 
 
