@@ -413,7 +413,9 @@ app.put('/edit', function(요청, 응답) {
         ||  요청.body.RS_RFP === undefined
         ||  요청.body.RS_RCR === undefined
         ||  요청.body.RS_RAP === undefined ){
-            return 응답.status(400).send({message : '선택되지 않은 객관식 항목이 있습니다.'});       // 2XX : 요청 성공, 4XX : 잘못된 요청으로 실패, 5XX : 서버의 문제  
+
+            return 응답.send("<script>alert('선택되지 않은 객관식 항목이 있습니다.'); location.href = document.referrer; </script>");
+            //return 응답.status(400).send({message : '선택되지 않은 객관식 항목이 있습니다.'});       // 2XX : 요청 성공, 4XX : 잘못된 요청으로 실패, 5XX : 서버의 문제  
         }
     
         
@@ -495,6 +497,8 @@ app.get('/chart/:id', function(요청, 응답) {
             return 응답.status(400).send({message : '피플결과가 없습니다.'});
         }
 
+        //console.log('결과.SL_WSL : ', 결과.SL_WSL, '결과.SL_DBPL : ', 결과.SL_DBPL);
+
         var 평가합계 = [
             {$match : { people_id : id}}, 
             {$group : { name :"$people_name", 
@@ -524,13 +528,15 @@ app.get('/chart/:id', function(요청, 응답) {
                         TOT_RS_RAP : { $sum : '$결과.RS_RAP '}
                       }}
         ];
-    
-        Evaluate_Answer.aggregate(평가합계).toArray(function (에러1, 결과1) {
-            // if (에러1) 
-            //     return 응답.status(400).send({message : '실패했습니다.'});       // 2XX : 요청 성공, 4XX : 잘못된 요청으로 실패, 5XX : 서버의 문제  
-                
-            console.log(결과1);
-        });
+
+        console.log('평가합계', Evaluate_Answer.aggregate(평가합계));
+
+    //    Evaluate_Answer.aggregate(평가합계).toArray(function (에러1, 결과1) {
+    //        //if (에러1) 
+    //        //     return 응답.status(400).send({message : '실패했습니다.'});       // 2XX : 요청 성공, 4XX : 잘못된 요청으로 실패, 5XX : 서버의 문제  
+    //            
+    //        console.log("결과 1 : ", 결과1);
+    //    });
 
     });
 
@@ -591,7 +597,7 @@ app.get('/chart/:id', function(요청, 응답) {
           // 추가 데이터셋을 필요에 따라 설정할 수 있습니다.
         ],
     };
-    console.log('챠트로 들어왔음');
+    //console.log('챠트로 들어왔음');
 
     응답.render('chart.ejs', { data });
 });

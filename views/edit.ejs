@@ -52,8 +52,8 @@
             <% for (let i = 0 ; i < data.MC.length ; i++) { %>
               <% var LQ_CODE = data.MC[i].LargeQusetion_Code %>
               <% var aaa = data.MC[i]; %>
-              <%    console.log("라지.코드:", aaa.LargeQusetion_Content);   %>
-              <P> <%= i + 1 %>) <%= data.MC[i].LargeQusetion_Content %> </P>
+              <%   // console.log("라지.코드:", aaa.LargeQuestion_Content);   %>
+              <P> <%= i + 1 %>) <%= data.MC[i].LargeQuestion_Content %> </P>
               <% j = 1;%>
               <% sum = 0;%>
               <% data.MCD.forEach(function(MCD, MCD_index) {  %>
@@ -63,24 +63,24 @@
                     <% //console.log("미들._id:", MCD._id, "미들.라지코드:", MCD.LQ_Code, "미들.미들코드:", MCD.MiddleQusetion_Code, "미들.콘텐츠:", MCD.MiddleQuestion_Content, "번호 : ", j);   %>
                     <% var MQ_CODE =  MCD.LQ_Code + "_" + MCD.MiddleQusetion_Code %>
                     <% var MQ_CODE_Answer = "Answer_" + MQ_CODE %>
-                    <p>   (<%= j++ %>) <%= MCD.MiddleQuestion_Content %></p>
+                    <p>  &nbsp; &nbsp; &nbsp; (<%= j++ %>) <%= MCD.MiddleQuestion_Content %></p>
                   </div>
                   <div class="col">
                     <div class="btn-group btn-group-toggle" data-toggle="buttons">
                       <label class="btn btn-secondary">
-                        <input type="radio" name="<%= MQ_CODE %>" id="option1" value="5" onclick='getAnswer(event, <%= LS %>, <%= sum %>)'> 최상
+                        <input type="radio" name="<%= MQ_CODE %>" id="option1" value="5"> 최상
                       </label>
                       <label class="btn btn-secondary">
-                        <input type="radio" name="<%= MQ_CODE %>" id="option2" value="4" onclick='getAnswer(event, <%= LS %>, <%= sum %>)'> 좋음
+                        <input type="radio" name="<%= MQ_CODE %>" id="option2" value="4"> 좋음
                       </label>
                       <label class="btn btn-secondary">
-                        <input type="radio" name="<%= MQ_CODE %>" id="option3" value="3" onclick='getAnswer(event, <%= LS %>, <%= sum %>)'> 보통
+                        <input type="radio" name="<%= MQ_CODE %>" id="option3" value="3"> 보통
                       </label>
                       <label class="btn btn-secondary">
-                        <input type="radio" name="<%= MQ_CODE %>" id="option4" value="2" onclick='getAnswer(event, <%= LS %>, <%= sum %>)'> 나쁨
+                        <input type="radio" name="<%= MQ_CODE %>" id="option4" value="2"> 나쁨
                       </label> 
                       <label class="btn btn-secondary">
-                        <input type="radio" name="<%= MQ_CODE %>" id="option5" value="1" onclick='getAnswer(event, <%= LS %>, <%= sum %>)'> 최하
+                        <input type="radio" name="<%= MQ_CODE %>" id="option5" value="1"> 최하
                       </label>  
                     </div>                   
                   </div>
@@ -137,62 +137,9 @@
         </div>
       </div>
 
-      <button type="submit" class="btn btn-outline-primary" onclick='calTotal(event)'>평가하기</button>
+      <button type="submit" class="btn btn-outline-primary">평가하기</button>
     </form>
   </div>
-  <script>
-    function calTotal(event, sum) {
-      alert(data.MC.length);
-
-      if (data.MC.length != 0) {
-        for (let i = 0 ; i < data.MC.length ; i++) {
-          alert(event.target.name);
-        }
-      }
-    }
-
-    function getAnswer(event, LS, sum) {
-
-      // 라디오 박스에서 가져온다. 
-      var strGetElementByName = event.target.name;
-
-
-      const splitted = strGetElementByName.split('_');
-
-      if (splitted.length === 2) {
-        const leftString = splitted[0];
-        const rightString = splitted[1];
-
-        alert('왼쪽 문자열:'+ leftString);
-        alert('오른쪽 문자열:'+ rightString);
-
-        if (LS !== leftString){
-          // var inputElements = document.getElementsByName(leftString);
-
-          // alert(strGetElementByName + " , " + inputElements.length);
-
-          // for (var i = 0; i < inputElements.length; i++) {
-          //   //var id = parseInt(요청.params.id);
-          //   inputElements[i].value = parseInt(event.target.value);// + parseInt(sum);
-          //   //alert(i + "," + inputElements[i].value + " , " + event.target.name + " , " + event.target.value);
-          // }
-          sum = parseInt(event.target.value);
-        }
-        else{
-          sum += parseInt(event.target.value);
-        }
-        alert('SUM :'+ sum);
-
-      } else {
-        alert('문자열에 "_"가 없거나 여러 개 있습니다.');
-      }
-    }
-    
-
-
-    
-  </script>
-
   <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
