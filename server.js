@@ -375,7 +375,7 @@ app.get('/edit/:id', function(요청, 응답) {
 
 // 수정 페이지(edit.ejs)에서 수정 버튼이 해당 글번호의 값을 불러와서 데이터를 업데이트 하는 기능 구현 
 app.put('/edit', function(요청, 응답) { 
-    console.log(요청.body);
+    //console.log(요청.body);
 
 
     var id = parseInt(요청.body.id);
@@ -384,36 +384,83 @@ app.put('/edit', function(요청, 응답) {
     // var age = 요청.body.age;
     // var institution = 요청.body.institution;
 
-    
+    let bTemp01 = (요청.body.SL_WSL === undefined);
+    let bTemp02 = (요청.body.SL_DBPL=== undefined);
+    let bTemp03 = (요청.body.SL_WDPL=== undefined);
+    let bTemp04 = (요청.body.SL_PRPL=== undefined);
+    let bTemp05 = (요청.body.SL_DNL === undefined);
+    let bTemp06 = (요청.body.CR_AAP === undefined);
+    let bTemp07 = (요청.body.CR_DPC === undefined);
+    let bTemp08 = (요청.body.CR_DVC === undefined);
+    let bTemp09 = (요청.body.CR_RPD === undefined);
+    let bTemp10 = (요청.body.SC_ECM === undefined);
+    let bTemp11 = (요청.body.SC_MDR === undefined);
+    let bTemp12 = (요청.body.SC_TMM === undefined);
+    let bTemp13 = (요청.body.SC_HLM === undefined);
+    let bTemp14 = (요청.body.PF_CSA === undefined);
+    let bTemp15 = (요청.body.PF_OBJ === undefined);
+    let bTemp16 = (요청.body.PF_RTN === undefined);
+    let bTemp17 = (요청.body.PF_UDS === undefined);
+    let bTemp18 = (요청.body.PF_DCM === undefined);
+    let bTemp19 = (요청.body.PF_CRT === undefined);
+    let bTemp20 = (요청.body.PF_LDS === undefined);
+    let bTemp21 = (요청.body.RS_RPA === undefined);
+    let bTemp22 = (요청.body.RS_RFP === undefined);
+    let bTemp23 = (요청.body.RS_RCR === undefined);
+    let bTemp24 = (요청.body.RS_RAP === undefined); 
 
 
     //var newDate = new Date();
     //var time = newDate.toFormat('YYYY-MM-DD HH24:MI:SS');
-    if (    요청.body.SL_WSL === undefined
-        ||  요청.body.SL_DBPL=== undefined
-        ||  요청.body.SL_WDPL=== undefined
-        ||  요청.body.SL_PRPL=== undefined
-        ||  요청.body.SL_DNL === undefined
-        ||  요청.body.CR_AAP === undefined
-        ||  요청.body.CR_DPC === undefined
-        ||  요청.body.CR_DVC === undefined
-        ||  요청.body.CR_RPD === undefined
-        ||  요청.body.SC_ECM === undefined
-        ||  요청.body.SC_MDR === undefined
-        ||  요청.body.SC_TMM === undefined
-        ||  요청.body.SC_HLM === undefined
-        ||  요청.body.PF_CSA === undefined
-        ||  요청.body.PF_OBJ === undefined
-        ||  요청.body.PF_RTN === undefined
-        ||  요청.body.PF_UDS === undefined
-        ||  요청.body.PF_DCM === undefined
-        ||  요청.body.PF_CRT === undefined
-        ||  요청.body.PF_LDS === undefined
-        ||  요청.body.RS_RPA === undefined
-        ||  요청.body.RS_RFP === undefined
-        ||  요청.body.RS_RCR === undefined
-        ||  요청.body.RS_RAP === undefined ){
-
+    if (    bTemp01
+        ||  bTemp02
+        ||  bTemp03
+        ||  bTemp04
+        ||  bTemp05
+        ||  bTemp06
+        ||  bTemp07
+        ||  bTemp08
+        ||  bTemp09
+        ||  bTemp10
+        ||  bTemp11
+        ||  bTemp12
+        ||  bTemp13
+        ||  bTemp14
+        ||  bTemp15
+        ||  bTemp16
+        ||  bTemp17
+        ||  bTemp18
+        ||  bTemp19
+        ||  bTemp20
+        ||  bTemp21
+        ||  bTemp22
+        ||  bTemp23
+        ||  bTemp24 ){
+            console.log("요청.body :", 요청.body);
+            // console.log("01 요청.body.SL_WSL :", bTemp01);
+            // console.log("02 요청.body.SL_DBPL:", bTemp02);
+            // console.log("03 요청.body.SL_WDPL:", bTemp03);
+            // console.log("04 요청.body.SL_PRPL:", bTemp04);
+            // console.log("05 요청.body.SL_DNL :", bTemp05);
+            // console.log("06 요청.body.CR_AAP :", bTemp06);
+            // console.log("07 요청.body.CR_DPC :", bTemp07);
+            // console.log("08 요청.body.CR_DVC :", bTemp08);
+            // console.log("09 요청.body.CR_RPD :", bTemp09);
+            // console.log("10 요청.body.SC_ECM :", bTemp10);
+            // console.log("11 요청.body.SC_MDR :", bTemp11);
+            // console.log("12 요청.body.SC_TMM :", bTemp12);
+            // console.log("13 요청.body.SC_HLM :", bTemp13);
+            // console.log("14 요청.body.PF_CSA :", bTemp14);
+            // console.log("15 요청.body.PF_OBJ :", bTemp15);
+            // console.log("16 요청.body.PF_RTN :", bTemp16);
+            // console.log("17 요청.body.PF_UDS :", bTemp17);
+            // console.log("18 요청.body.PF_DCM :", bTemp18);
+            // console.log("19 요청.body.PF_CRT :", bTemp19);
+            // console.log("20 요청.body.PF_LDS :", bTemp20);
+            // console.log("21 요청.body.RS_RPA :", bTemp21);
+            // console.log("22 요청.body.RS_RFP :", bTemp22);
+            // console.log("23 요청.body.RS_RCR :", bTemp23);
+            // console.log("24 요청.body.RS_RAP :", bTemp24);
             return 응답.send("<script>alert('선택되지 않은 객관식 항목이 있습니다.'); location.href = document.referrer; </script>");
             //return 응답.status(400).send({message : '선택되지 않은 객관식 항목이 있습니다.'});       // 2XX : 요청 성공, 4XX : 잘못된 요청으로 실패, 5XX : 서버의 문제  
         }
@@ -426,30 +473,30 @@ app.put('/edit', function(요청, 응답) {
     //    let objInsert = {_id : totalPeople + 1, name : req.body.name, institution : req.body.institution, age : req.body.age, 작성자_id : req.user._id, 작성자 : req.user.id, 작성자비번 : req.user.pw};
     let objInsert = {   //evaluate_time : time, 
                         people_id : id, people_name : name, 
-                        SL_WSL :요청.body.SL_WSL , 
-                        SL_DBPL:요청.body.SL_DBPL,
-                        SL_WDPL:요청.body.SL_WDPL,
-                        SL_PRPL:요청.body.SL_PRPL,
-                        SL_DNL :요청.body.SL_DNL ,
-                        CR_AAP :요청.body.CR_AAP ,
-                        CR_DPC :요청.body.CR_DPC ,
-                        CR_DVC :요청.body.CR_DVC ,
-                        CR_RPD :요청.body.CR_RPD ,
-                        SC_ECM :요청.body.SC_ECM ,
-                        SC_MDR :요청.body.SC_MDR ,
-                        SC_TMM :요청.body.SC_TMM ,
-                        SC_HLM :요청.body.SC_HLM ,
-                        PF_CSA :요청.body.PF_CSA ,
-                        PF_OBJ :요청.body.PF_OBJ ,
-                        PF_RTN :요청.body.PF_RTN ,
-                        PF_UDS :요청.body.PF_UDS ,
-                        PF_DCM :요청.body.PF_DCM ,
-                        PF_CRT :요청.body.PF_CRT ,
-                        PF_LDS :요청.body.PF_LDS ,
-                        RS_RPA :요청.body.RS_RPA ,
-                        RS_RFP :요청.body.RS_RFP ,
-                        RS_RCR :요청.body.RS_RCR ,
-                        RS_RAP :요청.body.RS_RAP 
+                        SL_WSL :parseInt(요청.body.SL_WSL) , 
+                        SL_DBPL:parseInt(요청.body.SL_DBPL),
+                        SL_WDPL:parseInt(요청.body.SL_WDPL),
+                        SL_PRPL:parseInt(요청.body.SL_PRPL),
+                        SL_DNL :parseInt(요청.body.SL_DNL) ,
+                        CR_AAP :parseInt(요청.body.CR_AAP) ,
+                        CR_DPC :parseInt(요청.body.CR_DPC) ,
+                        CR_DVC :parseInt(요청.body.CR_DVC) ,
+                        CR_RPD :parseInt(요청.body.CR_RPD) ,
+                        SC_ECM :parseInt(요청.body.SC_ECM) ,
+                        SC_MDR :parseInt(요청.body.SC_MDR) ,
+                        SC_TMM :parseInt(요청.body.SC_TMM) ,
+                        SC_HLM :parseInt(요청.body.SC_HLM) ,
+                        PF_CSA :parseInt(요청.body.PF_CSA) ,
+                        PF_OBJ :parseInt(요청.body.PF_OBJ) ,
+                        PF_RTN :parseInt(요청.body.PF_RTN) ,
+                        PF_UDS :parseInt(요청.body.PF_UDS) ,
+                        PF_DCM :parseInt(요청.body.PF_DCM) ,
+                        PF_CRT :parseInt(요청.body.PF_CRT) ,
+                        PF_LDS :parseInt(요청.body.PF_LDS) ,
+                        RS_RPA :parseInt(요청.body.RS_RPA) ,
+                        RS_RFP :parseInt(요청.body.RS_RFP) ,
+                        RS_RCR :parseInt(요청.body.RS_RCR) ,
+                        RS_RAP :parseInt(요청.body.RS_RAP) 
                     };
                     
     Evaluate_Answer.insertOne(objInsert, function(err2, result2){
@@ -483,60 +530,73 @@ app.get('/chart/:id', function(요청, 응답) {
     console.log('id : ', id);
 
     // DB의 data를 가져와서 해당 항목1,2,3,4,5와, 데이터1에 실제 값을 입력할것
-    Evaluate_Answer.find({people_id : id}).toArray(function(에러, 결과){
+    Evaluate_Answer.find({people_id : id}).toArray(function(에러, 피플파인드결과){
         //Evaluate_People.find({_id : id}, function(에러, 피플결과){
         if (에러) 
             return 응답.status(400).send({message : '실패했습니다.'});       // 2XX : 요청 성공, 4XX : 잘못된 요청으로 실패, 5XX : 서버의 문제  
         
-        //console.log('결과 : ', 결과);
-        if (!결과)
+        if (!피플파인드결과)
         {
-            console.log('피플결과가 없습니다');
+            console.log('피플파인드결과가 없습니다');
 
             //return 응답.redirect('/list');
-            return 응답.status(400).send({message : '피플결과가 없습니다.'});
+            return 응답.status(400).send({message : '피플파인드결과가 없습니다.'});
         }
 
-        //console.log('결과.SL_WSL : ', 결과.SL_WSL, '결과.SL_DBPL : ', 결과.SL_DBPL);
+        //console.log('피플파인드결과.SL_WSL : ', 피플파인드결과.SL_WSL, '피플파인드결과.SL_DBPL : ', 피플파인드결과.SL_DBPL);
+        console.log('피플파인드결과 : ', 피플파인드결과);
 
         var 평가합계 = [
             {$match : { people_id : id}}, 
-            {$group : { name :"$people_name", 
-                        TOT_SL_WSL : { $sum : '$결과.SL_WSL '}, 
-                        TOT_SL_DBPL: { $sum : '$결과.SL_DBPL'},
-                        TOT_SL_WDPL: { $sum : '$결과.SL_WDPL'},
-                        TOT_SL_PRPL: { $sum : '$결과.SL_PRPL'},
-                        TOT_SL_DNL : { $sum : '$결과.SL_DNL '},
-                        TOT_CR_AAP : { $sum : '$결과.CR_AAP '},
-                        TOT_CR_DPC : { $sum : '$결과.CR_DPC '},
-                        TOT_CR_DVC : { $sum : '$결과.CR_DVC '},
-                        TOT_CR_RPD : { $sum : '$결과.CR_RPD '},
-                        TOT_SC_ECM : { $sum : '$결과.SC_ECM '},
-                        TOT_SC_MDR : { $sum : '$결과.SC_MDR '},
-                        TOT_SC_TMM : { $sum : '$결과.SC_TMM '},
-                        TOT_SC_HLM : { $sum : '$결과.SC_HLM '},
-                        TOT_PF_CSA : { $sum : '$결과.PF_CSA '},
-                        TOT_PF_OBJ : { $sum : '$결과.PF_OBJ '},
-                        TOT_PF_RTN : { $sum : '$결과.PF_RTN '},
-                        TOT_PF_UDS : { $sum : '$결과.PF_UDS '},
-                        TOT_PF_DCM : { $sum : '$결과.PF_DCM '},
-                        TOT_PF_CRT : { $sum : '$결과.PF_CRT '},
-                        TOT_PF_LDS : { $sum : '$결과.PF_LDS '},
-                        TOT_RS_RPA : { $sum : '$결과.RS_RPA '},
-                        TOT_RS_RFP : { $sum : '$결과.RS_RFP '},
-                        TOT_RS_RCR : { $sum : '$결과.RS_RCR '},
-                        TOT_RS_RAP : { $sum : '$결과.RS_RAP '}
+            {$group : { _id : id,
+                        "name": { "$first": "$people_name" },
+                        TOT_SL_WSL : { $sum : '$피플파인드결과.SL_WSL'}, 
+                        // TOT_SL_DBPL: { $sum : '$피플파인드결과.SL_DBPL'},
+                        // TOT_SL_WDPL: { $sum : '$피플파인드결과.SL_WDPL'},
+                        // TOT_SL_PRPL: { $sum : '$피플파인드결과.SL_PRPL'},
+                        // TOT_SL_DNL : { $sum : '$피플파인드결과.SL_DNL '},
+                        // TOT_CR_AAP : { $sum : '$피플파인드결과.CR_AAP '},
+                        // TOT_CR_DPC : { $sum : '$피플파인드결과.CR_DPC '},
+                        // TOT_CR_DVC : { $sum : '$피플파인드결과.CR_DVC '},
+                        // TOT_CR_RPD : { $sum : '$피플파인드결과.CR_RPD '},
+                        // TOT_SC_ECM : { $sum : '$피플파인드결과.SC_ECM '},
+                        // TOT_SC_MDR : { $sum : '$피플파인드결과.SC_MDR '},
+                        // TOT_SC_TMM : { $sum : '$피플파인드결과.SC_TMM '},
+                        // TOT_SC_HLM : { $sum : '$피플파인드결과.SC_HLM '},
+                        // TOT_PF_CSA : { $sum : '$피플파인드결과.PF_CSA '},
+                        // TOT_PF_OBJ : { $sum : '$피플파인드결과.PF_OBJ '},
+                        // TOT_PF_RTN : { $sum : '$피플파인드결과.PF_RTN '},
+                        // TOT_PF_UDS : { $sum : '$피플파인드결과.PF_UDS '},
+                        // TOT_PF_DCM : { $sum : '$피플파인드결과.PF_DCM '},
+                        // TOT_PF_CRT : { $sum : '$피플파인드결과.PF_CRT '},
+                        // TOT_PF_LDS : { $sum : '$피플파인드결과.PF_LDS '},
+                        // TOT_RS_RPA : { $sum : '$피플파인드결과.RS_RPA '},
+                        // TOT_RS_RFP : { $sum : '$피플파인드결과.RS_RFP '},
+                        // TOT_RS_RCR : { $sum : '$피플파인드결과.RS_RCR '},
+                        // TOT_RS_RAP : { $sum : '$피플파인드결과.RS_RAP '}
                       }}
         ];
 
-        console.log('평가합계', Evaluate_Answer.aggregate(평가합계));
+        //console.log('평가합계', Evaluate_Answer.aggregate(평가합계));
+        // try {
+            Evaluate_Answer.aggregate(평가합계).toArray(function (에러1, 결과) {
+                //console.log("에러1 : ", 에러1);
+                if (에러1) {
+                    //console.log("에러1 : ", 에러1);
+                    //reject(에러1);
+                    //return 응답.send("<script>alert('평가 합계가 정상적으로 Aggregate 되지 못했습니다.'); location.href = document.referrer; </script>");
+                    return 응답.status(400).send({message : '실패했습니다.'});       // 2XX : 요청 성공, 4XX : 잘못된 요청으로 실패, 5XX : 서버의 문제  
 
-    //    Evaluate_Answer.aggregate(평가합계).toArray(function (에러1, 결과1) {
-    //        //if (에러1) 
-    //        //     return 응답.status(400).send({message : '실패했습니다.'});       // 2XX : 요청 성공, 4XX : 잘못된 요청으로 실패, 5XX : 서버의 문제  
-    //            
-    //        console.log("결과 1 : ", 결과1);
-    //    });
+                }
+                    
+                console.log("결과 : ", 결과);
+
+                //return 응답.send("<script>alert('정상합계가 되었나 봅니다.'); location.href = document.referrer; </script>");
+                return 응답.redirect('/list'); 
+            });       
+        // } catch (error) {
+        //     return 응답.send("<script>alert('트라이 캐치에서 에러가 캐치되었습니다.'); location.href = document.referrer; </script>");
+        // }
 
     });
 
@@ -599,5 +659,5 @@ app.get('/chart/:id', function(요청, 응답) {
     };
     //console.log('챠트로 들어왔음');
 
-    응답.render('chart.ejs', { data });
+    //응답.render('chart.ejs', { data });
 });

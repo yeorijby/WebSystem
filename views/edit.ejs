@@ -50,7 +50,7 @@
                     
           <% if (data.MC.length != 0 && data.MCD.length != 0 ) { %>
             <% for (let i = 0 ; i < data.MC.length ; i++) { %>
-              <% var LQ_CODE = data.MC[i].LargeQusetion_Code %>
+              <% var LQ_CODE = data.MC[i].LargeQuestion_Code %>
               <% var aaa = data.MC[i]; %>
               <%   // console.log("라지.코드:", aaa.LargeQuestion_Content);   %>
               <P> <%= i + 1 %>) <%= data.MC[i].LargeQuestion_Content %> </P>
@@ -60,8 +60,8 @@
                 <% if (data.MC[i].LargeQuestion_Code === MCD.LQ_Code ) {%>
                 <div class="row">
                   <div class="col">
-                    <% //console.log("미들._id:", MCD._id, "미들.라지코드:", MCD.LQ_Code, "미들.미들코드:", MCD.MiddleQusetion_Code, "미들.콘텐츠:", MCD.MiddleQuestion_Content, "번호 : ", j);   %>
-                    <% var MQ_CODE =  MCD.LQ_Code + "_" + MCD.MiddleQusetion_Code %>
+                    <% //console.log("미들._id:", MCD._id, "미들.라지코드:", MCD.LQ_Code, "미들.미들코드:", MCD.MiddleQuestion_Code, "미들.콘텐츠:", MCD.MiddleQuestion_Content, "번호 : ", j);   %>
+                    <% var MQ_CODE =  MCD.LQ_Code + "_" + MCD.MiddleQuestion_Code %>
                     <% var MQ_CODE_Answer = "Answer_" + MQ_CODE %>
                     <p>  &nbsp; &nbsp; &nbsp; (<%= j++ %>) <%= MCD.MiddleQuestion_Content %></p>
                   </div>
@@ -91,9 +91,9 @@
                 <% }%>
               <% }) %>
               <br>
-              <div class="row">
+              <!-- <div class="row">
                 <input type="text" name="<%= LQ_CODE %>"  placeholder="<%= LQ_CODE %>" value="">
-              </div>                            
+              </div>                             -->
               <br>
               <br>  
               <br>              
