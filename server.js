@@ -540,11 +540,12 @@ app.get('/chart/:id', function(요청, 응답) {
             console.log('피플파인드결과가 없습니다');
 
             //return 응답.redirect('/list');
-            return 응답.status(400).send({message : '피플파인드결과가 없습니다.'});
+            // return 응답.status(400).send({message : '피플파인드결과가 없습니다.'});
+            return 응답.send("<script>alert('피플 파인드 결과가 없습니다.'); location.href = document.referrer; </script>");
         }
 
         //console.log('피플파인드결과.SL_WSL : ', 피플파인드결과.SL_WSL, '피플파인드결과.SL_DBPL : ', 피플파인드결과.SL_DBPL);
-        console.log('피플파인드결과 : ', 피플파인드결과);
+        //console.log('피플파인드결과 : ', 피플파인드결과);
 
         var 평가합계 = [
             {$match : { people_id : id}}, 
@@ -589,75 +590,41 @@ app.get('/chart/:id', function(요청, 응답) {
 
                 }
                     
-                console.log("결과 : ", 결과);
+                //console.log("결과 : ", 결과);
+                let SumObj = 결과[0];
+                console.log('결과.name : ', SumObj.name);
+
+                // 항목을 자동으로 구분해 내는 로직이 필요하다!!!!
+                let SL = (SumObj.SL_DBPL + SumObj.SL_DNL + SumObj.SL_PRPL + SumObj.SL_WSL + SumObj.SL_WDPL) / 5;
+                let CR = (SumObj.CR_AAP + SumObj.CR_DPC + SumObj.CR_DVC + SumObj.CR_RPD) / 4;
+                let SC = (SumObj.SC_ECM + SumObj.SC_HLM + SumObj.SC_MDR + SumObj.SC_TMM) / 4;
+                let PF = (SumObj.PF_CRT + SumObj.PF_CSA + SumObj.PF_DCM + SumObj.PF_LDS + SumObj.PF_OBJ + SumObj.PF_RTN + SumObj.PF_UDS) / 7;
+                let RS = (SumObj.RS_RAP + SumObj.RS_RCR + SumObj.RS_RFP + SumObj.RS_RPA) / 4;
 
                 //return 응답.send("<script>alert('정상합계가 되었나 봅니다.'); location.href = document.referrer; </script>");
-                return 응답.redirect('/list'); 
+                //return 응답.redirect('/list'); 
+                const data = {
+                    labels: ['영적생활', '자질', '규모', '사역수행능력', '사역관계'],
+                    //labels: ['SL', 'CR', 'SC', 'PF', 'RS'],
+                    datasets: [
+                      {
+                        label: SumObj.name,
+                        data: [SL, CR, SC, PF, RS],
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 1,
+                      },
+                      // 추가 데이터셋을 필요에 따라 설정할 수 있습니다.
+                    ],
+                };
+
+                console.log('챠트로 들어왔음');
+            
+                응답.render('chart.ejs', { data });                
             });       
         // } catch (error) {
         //     return 응답.send("<script>alert('트라이 캐치에서 에러가 캐치되었습니다.'); location.href = document.referrer; </script>");
         // }
 
     });
-
-
-    // // DB의 data를 가져와서 해당 항목1,2,3,4,5와, 데이터1에 실제 값을 입력할것
-    // Evaluate_Answer.find({people_id : id}).toArray(function(에러, 결과){
-    //     //Evaluate_People.find({_id : id}, function(에러, 피플결과){
-    //     if (에러) 
-    //         return 응답.status(400).send({message : '실패했습니다.'});       // 2XX : 요청 성공, 4XX : 잘못된 요청으로 실패, 5XX : 서버의 문제  
-        
-    //     // console.log('결과1 : ', 결과);
-    //     if (!결과)
-    //     {
-    //         console.log('피플결과가 없습니다');
-
-    //         //return 응답.redirect('/list');
-    //         return 응답.status(400).send({message : '피플결과가 없습니다.'});
-    //     }
-    //     // var Result = {Answer : 결과};
-
-        
-
-
-    //     // 개인당 설문 횟수에 대한 반복문 : 3명이 이사람을 평가했다 => 3번
-    //     결과.forEach(function(Answer, Answer_index) {
-
-    //         console.log('Answer : ', Answer);
-    //         console.log('Answer_Length : ', Answer.length);
-    //         // // 개인당 설문의 질문 수에 대한 반복문 : 질문이 20개 => 20번
-    //         // Answer.forEach(function(Feild, Feild_index){
-    //         //     const feildName = Object.keys(Feild);
-
-    //         //     //const str = 'ABC_AAA';
-    //         //     const isAllUpperCase = /^[A-Z_]+$/.test(feildName);
-    
-    
-    //         //     console.log(isAllUpperCase); // true or false
-    
-    //         //     console.log('필드이름 : ', feildName, "객관식 여부 : ", isAllUpperCase);
-    
-    //         // })
-    //     });
-    // });
-
-
-
-
-    const data = {
-        labels: ['항목1', '항목2', '항목3', '항목4', '항목5'],
-        datasets: [
-          {
-            label: '데이터1',
-            data: [3, 5, 2, 4, 1],
-            backgroundColor: 'rgba(255, 99, 132, 0.2)',
-            borderColor: 'rgba(255, 99, 132, 1)',
-            borderWidth: 1,
-          },
-          // 추가 데이터셋을 필요에 따라 설정할 수 있습니다.
-        ],
-    };
-    //console.log('챠트로 들어왔음');
-
-    //응답.render('chart.ejs', { data });
 });
