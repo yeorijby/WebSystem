@@ -44,17 +44,20 @@
       <div class="container">
         <!-- aria-current="true" -->
         <div class="list-group">
-          <% for (let i = 0 ; i < people.length ; i++) { %>
-          <a href="/edit/<%= people[i]._id %>" class="list-group-item list-group-item-action">
-            <P>글번호 : <%= people[i]._id %> </P>
-            <h4>이름 : <%= people[i].name %> </h4>
-            <P>기관 : <%= people[i].institution %> </P>
-            <P>평가 횟수 : <%= people[i].counter %> </P>
-            <button class="btn btn-info put" data-id="<%= people[i]._id %>">평가내용</button>
-            <button class="btn btn-danger delete" data-id="<%= people[i]._id %>">삭제</button>
-            <!-- <button class="btn btn-danger chat" data-id="<%= people[i]._id %>" data-id-user="<%= people[i].작성자 %>">채팅하기</button> -->
-          </a>
-          <% } %>
+            <% for (let i = 0 ; i < people.length ; i++) { %>
+            <a href="/edit/<%= people[i]._id %>" class="list-group-item list-group-item-action">
+              <P>글번호 : <%= people[i]._id %> </P>
+              <h4>이름 : <%= people[i].name %> </h4>
+              <P>기관 : <%= people[i].institution %> </P>
+              <P>평가 횟수 : <%= people[i].counter %> </P>
+              <form action="/personal_chart/<%= people[i]._id %>" method="get">
+                <!-- <button class="btn btn-info Evaluate" data-id="<%= people[i]._id %>" type="submit">평가내용</button> -->
+                <button  class="btn btn-info Evaluate" data-id="<%= people[i]._id %>" type="submit">평가내용</button>
+                <button class="btn btn-danger delete" data-id="<%= people[i]._id %>">삭제</button>
+              </form>
+              <!-- <button class="btn btn-danger chat" data-id="<%= people[i]._id %>" data-id-user="<%= people[i].작성자 %>">채팅하기</button> -->
+            </a>
+            <% } %>
         </div>
       </div>
 
@@ -95,29 +98,40 @@
 
           });
 
-          $('.put').click(function(e){
-            var 임시글번호 = e.target.dataset.id; 
-            //var 방금누른거 = $(this);
-            var 임시유알엘 = '/chart/' + 임시글번호;
+          // $('.Evaluate').click(function(e){
+          //   var 임시글번호 = e.target.dataset.id; 
+          //   //var 방금누른거 = $(this);
+          //   var 임시유알엘 = '/chart/' + 임시글번호;
             
-            //console.log("글번호 : ", e.target.dataset.id);
-            // console.log("임시유알엘 : ", 임시유알엘);
-            //alert(e.target.dataset.id);
-            //alert(임시유알엘);
+          //   //console.log("글번호 : ", e.target.dataset.id);
+          //   // console.log("임시유알엘 : ", 임시유알엘);
+          //   //alert(e.target.dataset.id);
+          //   //alert(임시유알엘);
 
-            $.ajax({
-              method : 'GET',
-              url : 임시유알엘,
-              data : {_id : 임시글번호 },
-            }).done(function(결과){
-              // 페이지를 강제로 새로고침해주세요 
-              //alert('수정 페이지를 잘띄웠다고 서버에서 응답이 왔어요');
-              //방금누른거.parent('a').fadeOut();
-            }).fail(function(xhr, textStatus, errorThrown){
-              console.log(xhr, textStatus, errorThrown);
-            });
-          });
+          //   $.ajax({
+          //     method : 'GET',
+          //     url : 임시유알엘,
+          //     data : {_id : 임시글번호 },
+          //   }).done(function(결과){
+          //     // 페이지를 강제로 새로고침해주세요
+          //     var res_results = 결과;
+          //     //console.log(res_results.labels);
+          //     //console.log(res_results.dataset);
+          //     //alert('res_results.labels :' + res_results.labels);
+          //     //alert('res_results.dataset :' + res_results.dataset);
+          //     //alert('수정 페이지를 잘띄웠다고 서버에서 응답이 왔어요');
+          //     //var res_data = 결과; 
+          //     //window.location.href = "/chart?data=" + res_data;
+          //     //window.location.replace('/persnal_chart/' + 임시글번호);
 
+          //     //임시글번호    활용법
+
+          //     //window.location.replace('/persnal_chart?labels=' + res_results.labels + '&dataset=' + res_results.dataset);
+          //     //방금누른거.parent('a').fadeOut();
+          //   }).fail(function(xhr, textStatus, errorThrown){
+          //     console.log(xhr, textStatus, errorThrown);
+          //   });
+          // });
 
           $('.chat').click(function(e){
             var 임시글번호 = e.target.dataset.id; 

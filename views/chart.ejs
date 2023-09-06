@@ -16,42 +16,69 @@
   <h4 class="container mt-4"><strong>챠트 보기</strong></h4>
 
   <canvas id="myChart"></canvas>
+  
+  <% console.log(data); %>
 
+  <% if (data === undefined) { %>
+      <p>챠트 데이터를 가져오지 못했습니다.</p>
+      <P>그래서 임의로 맘대로 그려보겠습니다.</P>
+      <script>drawRadarChart(labels, datasets);</script>
+  <%  } else { %>
+    
+    <%// var Arg_Labels = data.labels; %>
+    <%// var Arg_Datasets = data.datasets; %>
+    <%// var Arg_ChartValue = data.value; %>
+    
   <script>
     function drawRadarChart(labels, datasets) {
-    var ctx = document.getElementById("myChart").getContext("2d");
+      // alert(labels);
+      // alert(datasets);
 
-    var data = {
-        labels: labels,
-        datasets: datasets,
-    };
+      
+      //console.log(labels);
+      //console.log(datasets);
+      //console.log(chartvalue);
+      
 
-    var options = {
-        // 추가적인 설정을 필요에 따라 지정할 수 있습니다.
-    };
+      var ctx = document.getElementById("myChart").getContext("2d");
 
-    var radarChart = new Chart(ctx, {
-        type: "radar",
-        data: data,
-        options: options,
-    });
+      var data = {
+          labels: labels,
+          datasets: datasets,
+      };
+
+      var options = {
+          // 추가적인 설정을 필요에 따라 지정할 수 있습니다.
+      };
+
+      console.log(data);
+
+      var radarChart = new Chart(ctx, {
+          type: "radar",
+          data: data,
+          options: options,
+      });
     }
 
     // 함수를 호출하여 Radar 차트를 그립니다.
-    var labels = ["항목1", "항목2", "항목3", "항목4", "항목5"];
-    var datasets = [
-    {
-        label: "데이터1",
-        data: [3, 5, 2, 4, 1],
-        backgroundColor: "rgba(255, 99, 132, 0.2)",
-        borderColor: "rgba(255, 99, 132, 1)",
-        borderWidth: 1,
-    },
-    // 추가 데이터셋을 필요에 따라 설정할 수 있습니다.
-    ];
+    var labels = ['영적생활', '자질', '규모', '사역수행능력', '사역관계'];           // 지금은 하드코딩으로 
+    //var chartvalue = [<%= data.value%>];// = ;
 
+    //console.log(chartvalue);
+
+    var datasets = [
+      {
+          label: "<%= data.labelName%>",
+          data: [<%= data.value%>],
+          backgroundColor: "rgba(255, 99, 132, 0.2)",
+          borderColor: "rgba(255, 99, 132, 1)",
+          borderWidth: 1,
+      },
+      // 추가 데이터셋을 필요에 따라 설정할 수 있습니다.
+    ];
     drawRadarChart(labels, datasets);
   </script>
+  <%  } %>
 
   <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
