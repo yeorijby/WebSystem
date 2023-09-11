@@ -111,9 +111,14 @@ app.get('/login', function(요청, 응답){
 // failureRedirect : '/fail' 는 실패했을 때 '/fail'이라는 곳으로 간다. 
 app.post('/login', passport.authenticate('local', { failureRedirect : '/fail' }), function(요청, 응답){
     //var id = parseInt(요청.user.id);
-    console.log(요청.user);
-    응답.render('index.ejs', {loginUser : 요청.user});
-    //응답.redirect('/');
+    // console.log(요청.user);
+
+
+    //let people = {};
+    //people.length = 0;
+    //응답.render('list.ejs', {people, loginUser : 요청.user});
+    
+    응답.redirect('/list');
 });
 
 
@@ -197,10 +202,10 @@ app.get('/write', function(요청, 응답) {
     응답.render('write.ejs');   // 응답값을 브라우져로 던지지 않음!
 });
 
-app.get('/list', function(요청, 응답) { 
+app.get('/list', 로그인했니, function(요청, 응답) { 
     Evaluate_People.find().toArray(function(에러, 결과){
-        console.log(결과);
-        응답.render('list.ejs', {people : 결과});
+        console.log(요청.user);
+        응답.render('list.ejs', {people : 결과, loginUser : 요청.user});
     });
 });
 
@@ -300,7 +305,7 @@ app.delete('/delete', function(요청, 응답) {
 });
 
 // 목록페이지(List.ejs) 수정버튼이 눌러졌을 때 수정 페이지(해당 글번호의 값을 불러와서 폼)를 띄우는 기능 구현
-app.get('/edit/:id', function(요청, 응답) { 
+app.get('/edit/:id', 로그인했니, function(요청, 응답) { 
     // var id = parseInt(요청.body._id);
     var id = parseInt(요청.params.id);
     //console.log('id : ',id);
@@ -381,7 +386,7 @@ app.get('/edit/:id', function(요청, 응답) {
 
 
 // 수정 페이지(edit.ejs)에서 수정 버튼이 해당 글번호의 값을 불러와서 데이터를 업데이트 하는 기능 구현 
-app.put('/edit', function(요청, 응답) { 
+app.put('/edit', 로그인했니, function(요청, 응답) { 
     //console.log(요청.body);
 
 
@@ -761,7 +766,7 @@ function MakeChartData(PeopleId){
 // });
 
 
-app.get('/personal_chart/:id', function(요청, 응답) { 
+app.get('/personal_chart/:id', 로그인했니, function(요청, 응답) { 
     var id = parseInt(요청.params.id);
     console.log('퍼스널 챠트로 들어왔음-original');
 
