@@ -47,8 +47,15 @@
           datasets: datasets,
       };
 
+
       var options = {
           // 추가적인 설정을 필요에 따라 지정할 수 있습니다.
+        scales: {
+          r: {
+            min: 0,     // Set the minimum value for the data range
+            max: 100     // Set the maximum value for the data range
+          }
+        }
       };
 
       console.log(data);
