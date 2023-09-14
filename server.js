@@ -106,6 +106,10 @@ app.get('/login', function(요청, 응답){
     응답.render('login.ejs');
 });
 
+app.get('/logout', function(요청, 응답){
+    요청.user = null;
+    응답.redirect('/login');
+});
 // passport.authenticate()는 인증하는 기능
 // 인증할때 local 방식으로 인증한다. 
 // failureRedirect : '/fail' 는 실패했을 때 '/fail'이라는 곳으로 간다. 
@@ -117,7 +121,7 @@ app.post('/login', passport.authenticate('local', { failureRedirect : '/fail' })
     //let people = {};
     //people.length = 0;
     //응답.render('list.ejs', {people, loginUser : 요청.user});
-    
+
     응답.redirect('/list');
 });
 
@@ -198,11 +202,14 @@ app.get('/', function(요청, 응답) {
     응답.render('index.ejs');      // 응답값을 브라우져로 던지지 않음!
 })
 
-app.get('/write', function(요청, 응답) { 
-    응답.render('write.ejs');   // 응답값을 브라우져로 던지지 않음!
+app.get('/write', 로그인했니, function(요청, 응답) { 
+    응답.render('write.ejs', {loginUser : 요청.user});   // 응답값을 브라우져로 던지지 않음!
 });
 
 app.get('/list', 로그인했니, function(요청, 응답) { 
+    //var id = parseInt(요청.user.id);
+    //console.log('/list에서 id : ', 요청.user);
+
     Evaluate_People.find().toArray(function(에러, 결과){
         console.log(요청.user);
         응답.render('list.ejs', {people : 결과, loginUser : 요청.user});
@@ -310,7 +317,8 @@ app.get('/edit/:id', 로그인했니, function(요청, 응답) {
     var id = parseInt(요청.params.id);
     //console.log('id : ',id);
     //console.log('edit/:id로 들어왔음 - original');
-
+    console.log('/edit/:id에서 요청.user : ', 요청.user);
+    
     Evaluate_People.findOne({_id : id}, function(에러, 피플결과){
         if (에러) 
             return 응답.status(400).send({message : '실패했습니다.'});       // 2XX : 요청 성공, 4XX : 잘못된 요청으로 실패, 5XX : 서버의 문제  
@@ -336,7 +344,7 @@ app.get('/edit/:id', 로그인했니, function(요청, 응답) {
                 console.log('객관식 결과가 없습니다');
     
                 // 일단 피플의 결과만 표시할것 
-                응답.render('edit.ejs', {data : Result});
+                응답.render('edit.ejs', {data : Result, loginUser : 요청.user});
             }
 
             Result = { ...Result, MC: 객관식결과 };
@@ -351,7 +359,7 @@ app.get('/edit/:id', 로그인했니, function(요청, 응답) {
                     console.log('객관식 결과가 없습니다');
         
                     // 일단 객관식의 결과만 표시할것 
-                    응답.render('edit.ejs', {data : Result});
+                    응답.render('edit.ejs', {data : Result, loginUser : 요청.user});
                 }
     
                 Result = { ...Result, MCD: 객관식디테일결과 };
@@ -366,14 +374,14 @@ app.get('/edit/:id', 로그인했니, function(요청, 응답) {
                         console.log('주관식 결과가 없습니다');
             
                         // 일단 객관식 디테일의 결과만 표시할것 
-                        응답.render('edit.ejs', {data : Result});
+                        응답.render('edit.ejs', {data : Result, loginUser : 요청.user});
                     }
         
                     Result = { ...Result, SE: 주관식결과 };
                     //console.log('결과5 : ', Result);
         
                     //console.log('edit/:id로 들어왔음 - 주관식 검색완료');
-                    응답.render('edit.ejs', {data : Result});
+                    응답.render('edit.ejs', {data : Result, loginUser : 요청.user});
                     //console.log('결과6 : ', Result);
                 });                
                 // 응답.render('edit.ejs', {data : Result});
@@ -896,7 +904,7 @@ app.get('/personal_chart/:id', 로그인했니, function(요청, 응답) {
 
             
         
-            응답.render('chart.ejs', { data });    // ★★★★★★★★★★★ Ajax로 요청시에는 응답.render가 동작하지 않음 !
+            응답.render('chart.ejs', { data, loginUser : 요청.user  });    // ★★★★★★★★★★★ Ajax로 요청시에는 응답.render가 동작하지 않음 !
             //응답.status(200).send({message : '성공했습니다.', res_data : data});      // 이렇게 해야함!
 
             //응답.redirect('/persnal_chart?chart_data=' + chart_data);       
