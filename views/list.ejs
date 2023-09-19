@@ -51,12 +51,11 @@
               <h4>이름 : <%= people[i].name %> </h4>
               <P>기관 : <%= people[i].institution %> </P>
               <P>평가 횟수 : <%= people[i].counter %> </P>
-              <% if (loginUser.id !== "test") { %>                
+              <% if (loginUser.id !== "test") { %>
                 <form action="/personal_chart/<%= people[i]._id %>" method="get">
-                  <button  class="btn btn-info Evaluate" data-id="<%= people[i]._id %>" type="submit">평가내용</button>
-                </form>  
-                <button class="btn btn-danger delete" data-id="<%= people[i]._id %>">삭제</button>
-                <!-- <button class="btn btn-danger chat" data-id="<%= people[i]._id %>" data-id-user="<%= people[i].작성자 %>">채팅하기</button> -->            
+                  <button class="btn btn-info Evaluate" type="submit">평가내용</button>  
+                  <button type="button" class="btn btn-danger delete" data-id="<%= people[i]._id %>">삭제</button>
+                </form>             
               <% } %>
             </a>
             <% } %>
@@ -93,47 +92,12 @@
             }).done(function(결과){
               // 페이지를 강제로 새로고침해주세요 
               console.log('삭제 성공했다고 서버에서 응답이 왔어요!');
-              alert('삭제 성공했다고 서버에서 응답이 왔어요!');
+              alert('삭제 성공!');
               지금누른거.parent('a').fadeOut();
             }).fail(function(xhr, textStatus, errorThrown){
               console.log(xhr, textStatus, errorThrown);
             });
           });
-
-          // $('.Evaluate').click(function(e){
-          //   var 임시글번호 = e.target.dataset.id; 
-          //   //var 방금누른거 = $(this);
-          //   var 임시유알엘 = '/chart/' + 임시글번호;
-            
-          //   //console.log("글번호 : ", e.target.dataset.id);
-          //   // console.log("임시유알엘 : ", 임시유알엘);
-          //   //alert(e.target.dataset.id);
-          //   //alert(임시유알엘);
-
-          //   $.ajax({
-          //     method : 'GET',
-          //     url : 임시유알엘,
-          //     data : {_id : 임시글번호 },
-          //   }).done(function(결과){
-          //     // 페이지를 강제로 새로고침해주세요
-          //     var res_results = 결과;
-          //     //console.log(res_results.labels);
-          //     //console.log(res_results.dataset);
-          //     //alert('res_results.labels :' + res_results.labels);
-          //     //alert('res_results.dataset :' + res_results.dataset);
-          //     //alert('수정 페이지를 잘띄웠다고 서버에서 응답이 왔어요');
-          //     //var res_data = 결과; 
-          //     //window.location.href = "/chart?data=" + res_data;
-          //     //window.location.replace('/persnal_chart/' + 임시글번호);
-
-          //     //임시글번호    활용법
-
-          //     //window.location.replace('/persnal_chart?labels=' + res_results.labels + '&dataset=' + res_results.dataset);
-          //     //방금누른거.parent('a').fadeOut();
-          //   }).fail(function(xhr, textStatus, errorThrown){
-          //     console.log(xhr, textStatus, errorThrown);
-          //   });
-          // });
 
           $('.chat').click(function(e){
             var 임시글번호 = e.target.dataset.id; 

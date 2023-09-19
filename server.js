@@ -531,7 +531,7 @@ let MakeChartData_LogString;
 
 app.get('/personal_chart/:id', 로그인했니, function(요청, 응답) { 
     var id = parseInt(요청.params.id);
-    console.log('퍼스널 챠트로 들어왔음-original');
+    console.log('퍼스널 챠트로 들어왔음-original', id);
 
     MakeChartData_LogString = "";
 
@@ -540,17 +540,17 @@ app.get('/personal_chart/:id', 로그인했니, function(요청, 응답) {
         if (에러) {
             MakeChartData_LogString += "ID가" + id + "인 사람의 답변항목을 가져오지 못했습니다.";
             console.log(MakeChartData_LogString);
-            // return 응답.status(400).send({message : '실패했습니다.'});       // 2XX : 요청 성공, 4XX : 잘못된 요청으로 실패, 5XX : 서버의 문제  
-            return null;
+            return 응답.status(400).send({message : '실패했습니다.'});       // 2XX : 요청 성공, 4XX : 잘못된 요청으로 실패, 5XX : 서버의 문제  
+            //return null;
         }
         
-        if (!피플파인드결과)
+        if ((!피플파인드결과) || (피플파인드결과.length <= 0 ))
         {
             //console.log('피플파인드결과가 없습니다');
             MakeChartData_LogString += "ID가" + id + "인 사람의 피플파인드 결과가 없습니다.";
             console.log(MakeChartData_LogString);
-            //return 응답.send("<script>alert('피플 파인드 결과가 없습니다.'); location.href = document.referrer; </script>");
-            return null;
+            return 응답.send("<script>alert('해당인은 한번도 평가 하지 않았습니다.'); location.href = document.referrer; </script>");
+            //return null;
         }
 
         //console.log('피플파인드결과.SL_WSL : ', 피플파인드결과.SL_WSL, '피플파인드결과.SL_DBPL : ', 피플파인드결과.SL_DBPL);
@@ -596,8 +596,8 @@ app.get('/personal_chart/:id', 로그인했니, function(요청, 응답) {
             if (에러1) {
                 MakeChartData_LogString += "Aggregete 하지 못했습니다.";
                 console.log(MakeChartData_LogString);
-                // return 응답.status(400).send({message : '실패했습니다.'});       // 2XX : 요청 성공, 4XX : 잘못된 요청으로 실패, 5XX : 서버의 문제  
-                return null;
+                return 응답.status(400).send({message : MakeChartData_LogString});       // 2XX : 요청 성공, 4XX : 잘못된 요청으로 실패, 5XX : 서버의 문제  
+                //return null;
 
             }
                 
@@ -632,11 +632,6 @@ app.get('/personal_chart/:id', 로그인했니, function(요청, 응답) {
             console.log(AGV_SL, AGV_CR, AGV_SC, AGV_PF, AGV_RS);
             console.log(ChartValue);
 
-            //console.log('챠트/:id로 들어왔음-데이터 합산 성공');
-
-            //return 응답.send("<script>alert('정상합계가 되었나 봅니다.'); location.href = document.referrer; </script>");
-            //return 응답.redirect('/list'); 
-
             data = {
                 labels: ['영적생활', '자질', '규모', '사역수행능력', '사역관계'],           // 지금은 하드코딩으로 
                 //labels: ['SL', 'CR', 'SC', 'PF', 'RS'],
@@ -658,22 +653,9 @@ app.get('/personal_chart/:id', 로그인했니, function(요청, 응답) {
             console.log(MakeChartData_LogString);
 
             
-        
             응답.render('chart.ejs', { data, loginUser : 요청.user  });    // ★★★★★★★★★★★ Ajax로 요청시에는 응답.render가 동작하지 않음 !
-            //응답.status(200).send({message : '성공했습니다.', res_data : data});      // 이렇게 해야함!
-
-            //응답.redirect('/persnal_chart?chart_data=' + chart_data);       
-            //응답.redirect('/persnal_chart'); 
-            //return chart_data;   
         });       
     });
-    
-    // if (chart_data === null || chart_data === undefined){
-
-    //     응답.status(400).send({message : MakeChartData_LogString});       // 2XX : 요청 성공, 4XX : 잘못된 요청으로 실패, 5XX : 서버의 문제  
-    // }
-
-    // 응답.render('chart.ejs', { data : chart_data });
 });
 
 app.delete('/delete', function(요청, 응답) { 
