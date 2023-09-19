@@ -291,26 +291,6 @@ app.post('/add', function(req, res){
   res.redirect('/list'); 
 });
 
-app.delete('/delete', function(요청, 응답) { 
-    //console.log(요청.body);
-
-    요청.body._id = parseInt(요청.body._id);
-
-    // var 삭제할데이터 = {_id: 요청.body._id, 작성자_id : 요청.user._id};
-    var 삭제할데이터 = {_id: 요청.body._id};
-
-    Evaluate_People.deleteOne(삭제할데이터, function(err, 결과){
-        if (err)       return console.log('에러 : ', err);
-
-        console.log('삭제완료');
-
-        //console.log('에러 : ',에러);
-
-        응답.status(200).send({message : '성공했습니다.'});       // 2XX : 요청 성공, 4XX : 잘못된 요청으로 실패, 5XX : 서버의 문제  
-
-    });    
-});
-
 // 목록페이지(List.ejs) 수정버튼이 눌러졌을 때 수정 페이지(해당 글번호의 값을 불러와서 폼)를 띄우는 기능 구현
 app.get('/edit/:id', 로그인했니, function(요청, 응답) { 
     // var id = parseInt(요청.body._id);
@@ -328,8 +308,10 @@ app.get('/edit/:id', 로그인했니, function(요청, 응답) {
         {
             console.log('피플결과가 없습니다');
 
-            //return 응답.redirect('/list');
-            return 응답.status(400).send({message : '피플결과가 없습니다.'});
+
+            // 피플 결과가 없으면 그냥 리스트로 Get 요청 하라.
+            return 응답.redirect('/list');
+            //return 응답.status(400).send({message : '피플결과가 없습니다.'});
         }
 
         var Result = {People : 피플결과};
@@ -546,233 +528,6 @@ app.put('/edit', 로그인했니, function(요청, 응답) {
 
 let chart_data = null;
 let MakeChartData_LogString;
-/*
-function MakeChartData(PeopleId){
-    MakeChartData_LogString = "";
-    var id = parseInt(PeopleId);
-    // DB의 data를 가져와서 해당 항목1,2,3,4,5와, 데이터1에 실제 값을 입력할것
-    Evaluate_Answer.find({people_id : id}).toArray(function(에러, 피플파인드결과){
-        //Evaluate_People.find({_id : id}, function(에러, 피플결과){
-        if (에러) {
-            MakeChartData_LogString += "ID가" + id + "인 사람의 답변항목을 가져오지 못했습니다.";
-            console.log(MakeChartData_LogString);
-            // return 응답.status(400).send({message : '실패했습니다.'});       // 2XX : 요청 성공, 4XX : 잘못된 요청으로 실패, 5XX : 서버의 문제  
-            return null;
-        }
-        
-        if (!피플파인드결과)
-        {
-            //console.log('피플파인드결과가 없습니다');
-            MakeChartData_LogString += "ID가" + id + "인 사람의 피플파인드 결과가 없습니다.";
-            console.log(MakeChartData_LogString);
-            //return 응답.send("<script>alert('피플 파인드 결과가 없습니다.'); location.href = document.referrer; </script>");
-            return null;
-        }
-
-        //console.log('피플파인드결과.SL_WSL : ', 피플파인드결과.SL_WSL, '피플파인드결과.SL_DBPL : ', 피플파인드결과.SL_DBPL);
-        //console.log('피플파인드결과 : ', 피플파인드결과);
-
-        //console.log('챠트/:id로 들어왔음-피플파인드 성공');
-        MakeChartData_LogString = "[ID가 " + id + "이면  "  + 피플파인드결과[0].people_name + " 입니다.]";
-
-        var 평가합계 = [
-            {$match : { people_id : id}}, 
-            {$group : { _id : id,
-                        "name": { "$first": "$people_name" },
-                        TOT_SL_WSL : { $sum : '$SL_WSL'}, 
-                        TOT_SL_DBPL: { $sum : '$SL_DBPL'},
-                        TOT_SL_WDPL: { $sum : '$SL_WDPL'},
-                        TOT_SL_PRPL: { $sum : '$SL_PRPL'},
-                        TOT_SL_DNL : { $sum : '$SL_DNL'},
-                        TOT_CR_AAP : { $sum : '$CR_AAP'},
-                        TOT_CR_DPC : { $sum : '$CR_DPC'},
-                        TOT_CR_DVC : { $sum : '$CR_DVC'},
-                        TOT_CR_RPD : { $sum : '$CR_RPD'},
-                        TOT_SC_ECM : { $sum : '$SC_ECM'},
-                        TOT_SC_MDR : { $sum : '$SC_MDR'},
-                        TOT_SC_TMM : { $sum : '$SC_TMM'},
-                        TOT_SC_HLM : { $sum : '$SC_HLM'},
-                        TOT_PF_CSA : { $sum : '$PF_CSA'},
-                        TOT_PF_OBJ : { $sum : '$PF_OBJ'},
-                        TOT_PF_RTN : { $sum : '$PF_RTN'},
-                        TOT_PF_UDS : { $sum : '$PF_UDS'},
-                        TOT_PF_DCM : { $sum : '$PF_DCM'},
-                        TOT_PF_CRT : { $sum : '$PF_CRT'},
-                        TOT_PF_LDS : { $sum : '$PF_LDS'},
-                        TOT_RS_RPA : { $sum : '$RS_RPA'},
-                        TOT_RS_RFP : { $sum : '$RS_RFP'},
-                        TOT_RS_RCR : { $sum : '$RS_RCR'},
-                        TOT_RS_RAP : { $sum : '$RS_RAP'}
-                      }}
-        ];
-
-        Evaluate_Answer.aggregate(평가합계).toArray(function (에러1, 결과) {
-            if (에러1) {
-                MakeChartData_LogString += "Aggregete 하지 못했습니다.";
-                console.log(MakeChartData_LogString);
-                // return 응답.status(400).send({message : '실패했습니다.'});       // 2XX : 요청 성공, 4XX : 잘못된 요청으로 실패, 5XX : 서버의 문제  
-                return null;
-
-            }
-                
-            let SumObj = 결과[0];
-            //console.log('결과.name : ', SumObj.name);
-
-            // 항목을 자동으로 구분해 내는 로직이 필요하다!!!! - 지금은 하드코딩으로 .....
-            let SL = (SumObj.SL_DBPL + SumObj.SL_DNL + SumObj.SL_PRPL + SumObj.SL_WSL + SumObj.SL_WDPL) / 5;
-            let CR = (SumObj.CR_AAP + SumObj.CR_DPC + SumObj.CR_DVC + SumObj.CR_RPD) / 4;
-            let SC = (SumObj.SC_ECM + SumObj.SC_HLM + SumObj.SC_MDR + SumObj.SC_TMM) / 4;
-            let PF = (SumObj.PF_CRT + SumObj.PF_CSA + SumObj.PF_DCM + SumObj.PF_LDS + SumObj.PF_OBJ + SumObj.PF_RTN + SumObj.PF_UDS) / 7;
-            let RS = (SumObj.RS_RAP + SumObj.RS_RCR + SumObj.RS_RFP + SumObj.RS_RPA) / 4;
-
-            //console.log('챠트/:id로 들어왔음-데이터 합산 성공');
-
-            //return 응답.send("<script>alert('정상합계가 되었나 봅니다.'); location.href = document.referrer; </script>");
-            //return 응답.redirect('/list'); 
-            chart_data = {
-                labels: ['영적생활', '자질', '규모', '사역수행능력', '사역관계'],           // 지금은 하드코딩으로 
-                //labels: ['SL', 'CR', 'SC', 'PF', 'RS'],
-                datasets: [
-                    {
-                    label: SumObj.name,
-                    data: [SL, CR, SC, PF, RS],
-                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                    borderColor: 'rgba(255, 99, 132, 1)',
-                    borderWidth: 1,
-                    },
-                    // 추가 데이터셋을 필요에 따라 설정할 수 있습니다.
-                ],
-            };
-
-            MakeChartData_LogString += "챠트데이터 만들기 성공하였습니다.";
-            console.log(MakeChartData_LogString);
-
-            console.log(chart_data);
-        
-            //응답.render('chart.ejs', { data });    // ★★★★★★★★★★★ Ajax로 요청시에는 응답.render가 동작하지 않음 !
-            //응답.status(200).send({message : '성공했습니다.', res_data : data});      // 이렇게 해야함!
-
-            //응답.redirect('/persnal_chart?chart_data=' + chart_data);       
-            //응답.redirect('/persnal_chart'); 
-            return chart_data;   
-        });       
-    });
-
-    console.log('왜 일로 빠지는 거야');
-    return null;
-}
-//*/
-// app.get('/chart/:id', function(요청, 응답) { 
-//     var id = parseInt(요청.params.id);
-//     console.log('id : ', id);
-//     //console.log('챠트/:id로 들어왔음-original');
-
-//     // // DB의 data를 가져와서 해당 항목1,2,3,4,5와, 데이터1에 실제 값을 입력할것
-//     // Evaluate_Answer.find({people_id : id}).toArray(function(에러, 피플파인드결과){
-//     //     //Evaluate_People.find({_id : id}, function(에러, 피플결과){
-//     //     if (에러) 
-//     //         return 응답.status(400).send({message : '실패했습니다.'});       // 2XX : 요청 성공, 4XX : 잘못된 요청으로 실패, 5XX : 서버의 문제  
-        
-//     //     if (!피플파인드결과)
-//     //     {
-//     //         console.log('피플파인드결과가 없습니다');
-
-//     //         //return 응답.redirect('/list');
-//     //         // return 응답.status(400).send({message : '피플파인드결과가 없습니다.'});
-//     //         return 응답.send("<script>alert('피플 파인드 결과가 없습니다.'); location.href = document.referrer; </script>");
-//     //     }
-
-//     //     //console.log('피플파인드결과.SL_WSL : ', 피플파인드결과.SL_WSL, '피플파인드결과.SL_DBPL : ', 피플파인드결과.SL_DBPL);
-//     //     //console.log('피플파인드결과 : ', 피플파인드결과);
-
-//     //     //console.log('챠트/:id로 들어왔음-피플파인드 성공');
-
-//     //     var 평가합계 = [
-//     //         {$match : { people_id : id}}, 
-//     //         {$group : { _id : id,
-//     //                     "name": { "$first": "$people_name" },
-//     //                     TOT_SL_WSL : { $sum : '$SL_WSL'}, 
-//     //                     TOT_SL_DBPL: { $sum : '$SL_DBPL'},
-//     //                     TOT_SL_WDPL: { $sum : '$SL_WDPL'},
-//     //                     TOT_SL_PRPL: { $sum : '$SL_PRPL'},
-//     //                     TOT_SL_DNL : { $sum : '$SL_DNL'},
-//     //                     TOT_CR_AAP : { $sum : '$CR_AAP'},
-//     //                     TOT_CR_DPC : { $sum : '$CR_DPC'},
-//     //                     TOT_CR_DVC : { $sum : '$CR_DVC'},
-//     //                     TOT_CR_RPD : { $sum : '$CR_RPD'},
-//     //                     TOT_SC_ECM : { $sum : '$SC_ECM'},
-//     //                     TOT_SC_MDR : { $sum : '$SC_MDR'},
-//     //                     TOT_SC_TMM : { $sum : '$SC_TMM'},
-//     //                     TOT_SC_HLM : { $sum : '$SC_HLM'},
-//     //                     TOT_PF_CSA : { $sum : '$PF_CSA'},
-//     //                     TOT_PF_OBJ : { $sum : '$PF_OBJ'},
-//     //                     TOT_PF_RTN : { $sum : '$PF_RTN'},
-//     //                     TOT_PF_UDS : { $sum : '$PF_UDS'},
-//     //                     TOT_PF_DCM : { $sum : '$PF_DCM'},
-//     //                     TOT_PF_CRT : { $sum : '$PF_CRT'},
-//     //                     TOT_PF_LDS : { $sum : '$PF_LDS'},
-//     //                     TOT_RS_RPA : { $sum : '$RS_RPA'},
-//     //                     TOT_RS_RFP : { $sum : '$RS_RFP'},
-//     //                     TOT_RS_RCR : { $sum : '$RS_RCR'},
-//     //                     TOT_RS_RAP : { $sum : '$RS_RAP'}
-//     //                   }}
-//     //     ];
-
-//     //     Evaluate_Answer.aggregate(평가합계).toArray(function (에러1, 결과) {
-//     //         if (에러1) {
-//     //             return 응답.status(400).send({message : '실패했습니다.'});       // 2XX : 요청 성공, 4XX : 잘못된 요청으로 실패, 5XX : 서버의 문제  
-//     //         }
-                
-//     //         let SumObj = 결과[0];
-//     //         //console.log('결과.name : ', SumObj.name);
-
-//     //         // 항목을 자동으로 구분해 내는 로직이 필요하다!!!! - 지금은 하드코딩으로 .....
-//     //         let SL = (SumObj.SL_DBPL + SumObj.SL_DNL + SumObj.SL_PRPL + SumObj.SL_WSL + SumObj.SL_WDPL) / 5;
-//     //         let CR = (SumObj.CR_AAP + SumObj.CR_DPC + SumObj.CR_DVC + SumObj.CR_RPD) / 4;
-//     //         let SC = (SumObj.SC_ECM + SumObj.SC_HLM + SumObj.SC_MDR + SumObj.SC_TMM) / 4;
-//     //         let PF = (SumObj.PF_CRT + SumObj.PF_CSA + SumObj.PF_DCM + SumObj.PF_LDS + SumObj.PF_OBJ + SumObj.PF_RTN + SumObj.PF_UDS) / 7;
-//     //         let RS = (SumObj.RS_RAP + SumObj.RS_RCR + SumObj.RS_RFP + SumObj.RS_RPA) / 4;
-
-//     //         //console.log('챠트/:id로 들어왔음-데이터 합산 성공');
-
-//     //         //return 응답.send("<script>alert('정상합계가 되었나 봅니다.'); location.href = document.referrer; </script>");
-//     //         //return 응답.redirect('/list'); 
-//     //         chart_data = {
-//     //             labels: ['영적생활', '자질', '규모', '사역수행능력', '사역관계'],           // 지금은 하드코딩으로 
-//     //             //labels: ['SL', 'CR', 'SC', 'PF', 'RS'],
-//     //             datasets: [
-//     //                 {
-//     //                 label: SumObj.name,
-//     //                 data: [SL, CR, SC, PF, RS],
-//     //                 backgroundColor: 'rgba(255, 99, 132, 0.2)',
-//     //                 borderColor: 'rgba(255, 99, 132, 1)',
-//     //                 borderWidth: 1,
-//     //                 },
-//     //                 // 추가 데이터셋을 필요에 따라 설정할 수 있습니다.
-//     //             ],
-//     //         };
-
-//     //         console.log('챠트/:id로 들어왔음-챠트 데이터 만들기 성공!');
-        
-//     //         //응답.render('chart.ejs', { data });    // ★★★★★★★★★★★ Ajax로 요청시에는 응답.render가 동작하지 않음 !
-//     //         //응답.status(200).send({message : '성공했습니다.', res_data : data});      // 이렇게 해야함!
-
-//     //         //응답.redirect('/persnal_chart?chart_data=' + chart_data);       
-//     //         응답.redirect('/persnal_chart');      
-//     //     });       
-//     // });
-
-//     chart_data = MakeChartData(id);
-
-//     if (chart_data === null || chart_data === undefined){
-//         응답.status(400).send({message : MakeChartData_LogString});       // 2XX : 요청 성공, 4XX : 잘못된 요청으로 실패, 5XX : 서버의 문제  
-//     }
-
-//     응답.redirect('/personal_chart/' + id);
-//     //응답.status(200).send({message : '성공했습니다.', data : chart_data});      // 이렇게 해야함!
-
-// });
-
 
 app.get('/personal_chart/:id', 로그인했니, function(요청, 응답) { 
     var id = parseInt(요청.params.id);
@@ -919,4 +674,23 @@ app.get('/personal_chart/:id', 로그인했니, function(요청, 응답) {
     // }
 
     // 응답.render('chart.ejs', { data : chart_data });
+});
+
+app.delete('/delete', function(요청, 응답) { 
+    //console.log(요청.body);
+
+    요청.body._id = parseInt(요청.body._id);
+
+    // var 삭제할데이터 = {_id: 요청.body._id, 작성자_id : 요청.user._id};
+    var 삭제할데이터 = {_id: 요청.body._id};
+
+    Evaluate_People.deleteOne(삭제할데이터, function(err, 결과){
+        if (err)       return console.log('에러 : ', err);
+
+        console.log('삭제완료');
+
+        //console.log('에러 : ',에러);
+
+        응답.status(200).send({message : '성공했습니다.'});       // 2XX : 요청 성공, 4XX : 잘못된 요청으로 실패, 5XX : 서버의 문제  
+    });    
 });

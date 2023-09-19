@@ -54,9 +54,9 @@
               <% if (loginUser.id !== "test") { %>                
                 <form action="/personal_chart/<%= people[i]._id %>" method="get">
                   <button  class="btn btn-info Evaluate" data-id="<%= people[i]._id %>" type="submit">평가내용</button>
-                  <button class="btn btn-danger delete" data-id="<%= people[i]._id %>">삭제</button>
-                  <!-- <button class="btn btn-danger chat" data-id="<%= people[i]._id %>" data-id-user="<%= people[i].작성자 %>">채팅하기</button> -->
-                </form>                
+                </form>  
+                <button class="btn btn-danger delete" data-id="<%= people[i]._id %>">삭제</button>
+                <!-- <button class="btn btn-danger chat" data-id="<%= people[i]._id %>" data-id-user="<%= people[i].작성자 %>">채팅하기</button> -->            
               <% } %>
             </a>
             <% } %>
@@ -93,11 +93,11 @@
             }).done(function(결과){
               // 페이지를 강제로 새로고침해주세요 
               console.log('삭제 성공했다고 서버에서 응답이 왔어요!');
+              alert('삭제 성공했다고 서버에서 응답이 왔어요!');
               지금누른거.parent('a').fadeOut();
             }).fail(function(xhr, textStatus, errorThrown){
               console.log(xhr, textStatus, errorThrown);
             });
-
           });
 
           // $('.Evaluate').click(function(e){
