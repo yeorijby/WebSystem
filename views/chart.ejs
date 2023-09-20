@@ -7,83 +7,190 @@
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
   <title>Document</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+  <script type="module" src="acquisitions.js"></script>
+
+  <script>
+    // 해더에 넣어야
+  import Chart from 'chart.js/auto';
+  import { getRelativePosition } from 'chart.js/helpers';
+  </script>
+  <script src="inc/Utils.js"></script>
+     
 </head>
 <body>
   <%- include('nav.ejs')%>
-  
-  <!-- (여긴 다른 페이지에 있던 <nav></nav> 태그 전부) -->
+  <div style="width: 90%;"><canvas id="myChart"></canvas></div>
 
-  <h4 class="container mt-4"><strong>챠트 보기</strong></h4>
+  <!-- <table id="myTable" border="1">
+    <tr>
+      <th>Category</th>
+      <th>Value</th> 
+    </tr>
+  </table> -->
 
-  <canvas id="myChart"></canvas>
-  
   <% console.log(data); %>
-
+  <script>
+    var labels = ['영적생활', '자질', '규모', '사역수행능력', '사역관계'];           // 지금은 하드코딩으로 
+    
+  </script>
   <% if (data === undefined) { %>
       <p>챠트 데이터를 가져오지 못했습니다.</p>
       <P>그래서 임의로 맘대로 그려보겠습니다.</P>
-      <script>drawRadarChart(labels, datasets);</script>
+      <script>
+      drawRadarChart(labels, datasets);
+      </script>
   <%  } else { %>
-    
-    <%// var Arg_Labels = data.labels; %>
-    <%// var Arg_Datasets = data.datasets; %>
-    <%// var Arg_ChartValue = data.value; %>
-    
+
   <script>
+    // 함수를 호출하여 Radar 차트를 그립니다.
+    //var labels = ['영적생활', '자질', '규모', '사역수행능력', '사역관계'];           // 지금은 하드코딩으로 
+    var datas = [<%= data.value%>];
+
     function drawRadarChart(labels, datasets) {
-      // alert(labels);
-      // alert(datasets);
-
-      
-      //console.log(labels);
-      //console.log(datasets);
-      //console.log(chartvalue);
-      
-
-      var ctx = document.getElementById("myChart").getContext("2d");
+      var ctxHTML = document.getElementById("myChart").getContext("2d");
 
       var data = {
           labels: labels,
           datasets: datasets,
       };
-
-
-      var options = {
-          // 추가적인 설정을 필요에 따라 지정할 수 있습니다.
-        scales: {
-          r: {
-            min: 0,     // Set the minimum value for the data range
-            max: 100     // Set the maximum value for the data range
+////////////////////////////////////////////////////////////////////////////////////////////////
+      let config = {
+        type: 'radar',
+        data: data,
+        options: {
+          responsive: true,
+          scales: {
+            r: {
+              min: 0,     // Set the minimum value for the data range
+              max: 100     // Set the maximum value for the data range
+            }
+          },
+          plugins: {
+            title: {
+              display: true,
+              text: '<%= data.labelName%>의 시무 능력 평가 Chart 보기',
+              padding: {
+                  top: 10,
+                  bottom: 30
+              },
+              font: {
+                  size: 36
+              }
+            }
           }
-        }
-      };
+        },
+      };      
+////////////////////////////////////////////////////////////////////////////////////////////////
 
-      console.log(data);
-
-      var radarChart = new Chart(ctx, {
-          type: "radar",
-          data: data,
-          options: options,
-      });
+      var chart = new Chart(ctxHTML, config);      
     }
-
-    // 함수를 호출하여 Radar 차트를 그립니다.
-    var labels = ['영적생활', '자질', '규모', '사역수행능력', '사역관계'];           // 지금은 하드코딩으로 
-    //var chartvalue = [<%= data.value%>];// = ;
-
-    //console.log(chartvalue);
 
     var datasets = [
       {
           label: "<%= data.labelName%>",
-          data: [<%= data.value%>],
+          data: datas,
           backgroundColor: "rgba(255, 99, 132, 0.2)",
           borderColor: "rgba(255, 99, 132, 1)",
           borderWidth: 1,
       },
       // 추가 데이터셋을 필요에 따라 설정할 수 있습니다.
     ];
+////////////////////////////////////////////////////////////////////////////////////////////////
+      const actions = [
+        // {
+        //   name: 'Randomize',
+        //   handler(chart) {
+        //     chart.data.datasets.forEach(dataset => {
+        //       dataset.data = Utils.numbers({count: chart.data.labels.length, min: 0, max: 100});
+        //     });
+        //     chart.update();
+        //   }
+        // },
+        {
+          name: 'Add Dataset',
+          handler(chart) {
+            const data = chart.data;
+            const dsColor = Utils.namedColor(chart.data.datasets.length);
+            const newDataset = {
+              label: 'Dataset ' + (data.datasets.length + 1),
+              backgroundColor: Utils.transparentize(dsColor, 0.5),
+              borderColor: dsColor,
+              data: Utils.numbers({count: data.labels.length, min: 0, max: 100}),
+            };
+            chart.data.datasets.push(newDataset);
+            chart.update();
+          }
+        },
+        {
+          name: 'Add Data',
+          handler(chart) {
+            const data = chart.data;
+            if (data.datasets.length > 0) {
+              data.labels = Utils.months({count: data.labels.length + 1});
+
+              for (let index = 0; index < data.datasets.length; ++index) {
+                data.datasets[index].data.push(Utils.rand(0, 100));
+              }
+
+              chart.update();
+            }
+          }
+        },
+        {
+          name: 'Remove Dataset',
+          handler(chart) {
+            chart.data.datasets.pop();
+            chart.update();
+          }
+        },
+        {
+          name: 'Remove Data',
+          handler(chart) {
+            chart.data.labels.splice(-1, 1); // remove the label first
+
+            chart.data.datasets.forEach(dataset => {
+              dataset.data.pop();
+            });
+
+            chart.update();
+          }
+        }
+      ];
+////////////////////////////////////////////////////////////////////////////////////////////////
+    function addChartData(chart, label, data) {
+        chart.data.labels.push(label);
+        chart.data.datasets.forEach((dataset) => {
+            dataset.data.push(data);
+        });
+        chart.update();
+    }
+
+    function removeChartData(chart) {
+        chart.data.labels.pop();
+        chart.data.datasets.forEach((dataset) => {
+            dataset.data.pop();
+        });
+        chart.update();
+    }
+    function createChartTable(labels, data) {
+
+      var table = document.getElementById("myTable");
+
+      for (let i=0; i<labels.length; i++) {
+        var row = table.insertRow(-1);
+    
+        var cell1 = row.insertCell(0);
+        var cell2 = row.insertCell(1);
+
+        cell1.innerHTML = labels[i];
+        cell2.innerHTML = data[i];
+      }
+    }
+
+
     drawRadarChart(labels, datasets);
+    //createChartTable(labels, datas)
   </script>
   <%  } %>
 

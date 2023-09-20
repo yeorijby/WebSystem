@@ -198,8 +198,8 @@ app.get('/', function(요청, 응답) {
     var id = parseInt(요청.params.id);
     console.log('/에서 id : ', 요청.user);
     //console.log('/에서 id : ',id);
-    
-    응답.render('index.ejs');      // 응답값을 브라우져로 던지지 않음!
+    응답.redirect('/login');
+    //응답.render('index.ejs');      // 응답값을 브라우져로 던지지 않음!
 })
 
 app.get('/write', 로그인했니, function(요청, 응답) { 
